@@ -36,9 +36,9 @@ public:
 
 class FileManager {
 public:
-    virtual ByteArray get_file(FileType ft) = 0;
-    virtual ByteArray create_file(FileType ft) = 0;
-    virtual ByteArray start_overwrite(FileType ft) = 0;
+    virtual ByteArray* get_file(FileType ft) = 0;
+    virtual ByteArray* create_file(FileType ft) = 0;
+    virtual ByteArray* start_overwrite(FileType ft) = 0;
     virtual void end_overwrite(FileType ft) = 0;
     virtual void remove(FileType ft) = 0;
 };
