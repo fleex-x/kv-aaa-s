@@ -1,12 +1,13 @@
 #include "doctest.h"
-#include "FileManager.h"
+#include "MemoryManager.h"
 #include <memory>
 
 using namespace kvaaas;
 
 TEST_CASE("Simple test") {
-    FileType ft(FilePurpose::SST, 4);
-    CHECK(ft.get_sst_level() == 4);
+    MemoryType mt(MemoryPurpose::SST, 4);
+    CHECK(mt.get_sst_level() == 4);
+    CHECK(mt.get_memory_purpose() == MemoryPurpose::SST);
 }
 
 TEST_CASE("RAMByteArray") {
