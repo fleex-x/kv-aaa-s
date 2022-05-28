@@ -34,3 +34,4 @@ public:
 
     virtual ~FileManager() = default;
 };
+
