@@ -41,4 +41,6 @@ public:
     virtual ByteArray* start_overwrite(FileType ft) = 0;
     virtual void end_overwrite(FileType ft) = 0;
     virtual void remove(FileType ft) = 0;
+
+    virtual ~FileManager() = default;
 };
