@@ -3,6 +3,8 @@
 #include <optional>
 #include <cassert>
 
+namespace kvaaas {
+
 FileType::FileType(FilePurpose fp_, std::optional<std::size_t> sst_level_) :
     fp(fp_),
     sst_level(sst_level_) {
@@ -17,4 +19,6 @@ FilePurpose FileType::get_file_purpose() const {
 
 std::size_t FileType::get_sst_level() const {
     return sst_level.value();
+}
+
 }

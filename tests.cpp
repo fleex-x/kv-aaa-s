@@ -2,6 +2,8 @@
 #include "FileManager.h"
 #include <memory>
 
+using namespace kvaaas;
+
 TEST_CASE("Simple test") {
     FileType ft(FilePurpose::SST, 4);
     CHECK(ft.get_sst_level() == 4);

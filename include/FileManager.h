@@ -4,6 +4,8 @@
 #include <cassert>
 #include "ByteArray.h"
 
+namespace kvaaas {
+
 enum class FilePurpose {
     KVS = 0,
     SST = 1,
@@ -26,12 +28,17 @@ public:
 
 class FileManager {
 public:
-    virtual ByteArray* get_file(FileType ft) = 0;
-    virtual ByteArray* create_file(FileType ft) = 0;
-    virtual ByteArray* start_overwrite(FileType ft) = 0;
+    virtual ByteArray *get_file(FileType ft) = 0;
+
+    virtual ByteArray *create_file(FileType ft) = 0;
+
+    virtual ByteArray *start_overwrite(FileType ft) = 0;
+
     virtual void end_overwrite(FileType ft) = 0;
+
     virtual void remove(FileType ft) = 0;
 
     virtual ~FileManager() = default;
 };
 
+}

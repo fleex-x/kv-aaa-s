@@ -1,9 +1,12 @@
 #pragma once
 #include <vector>
 
+namespace kvaaas {
+
 class ByteArray {
 public:
     virtual void append(const std::vector<unsigned char> &bytes) = 0;
+
     virtual std::vector<unsigned char> read(int l, int r) = 0; //[l, r) -- semi-interval
     virtual std::size_t size() = 0;
 
@@ -11,7 +14,7 @@ public:
 };
 
 
-class RAMByteArray : public  ByteArray {
+class RAMByteArray : public ByteArray {
 private:
     std::vector<unsigned char> byte_array;
 public:
@@ -22,3 +25,5 @@ public:
 
     std::size_t size() override;
 };
+
+}
