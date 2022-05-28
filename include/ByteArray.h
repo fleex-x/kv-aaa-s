@@ -16,16 +16,9 @@ private:
     std::vector<unsigned char> byte_array;
 public:
 
-    void append(const std::vector<unsigned char> &bytes) override {
-        byte_array.insert(byte_array.end(), bytes.begin(), bytes.end());
-    }
+    void append(const std::vector<unsigned char> &bytes) override;
 
-    std::vector<unsigned char> read(int l, int r) override {
-        return {byte_array.begin() + l, byte_array.begin() + r};
-    }
+    std::vector<unsigned char> read(int l, int r) override;
 
-    std::size_t size() override {
-        return byte_array.size();
-    }
-
+    std::size_t size() override;
 };

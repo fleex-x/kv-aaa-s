@@ -16,21 +16,11 @@ private:
     FilePurpose fp;
     std::optional<std::size_t> sst_level;
 public:
-    [[maybe_unused]] explicit FileType(FilePurpose fp_, std::optional<std::size_t> sst_level_ = {}) :
-        fp(fp_),
-        sst_level(sst_level_) {
-        if (fp_ == FilePurpose::SST) {
-            assert(sst_level.has_value());
-        }
-    }
+    explicit FileType(FilePurpose fp_, std::optional<std::size_t> sst_level_ = {});
 
-    [[nodiscard]] FilePurpose get_file_purpose() const {
-        return fp;
-    }
+    [[nodiscard]] FilePurpose get_file_purpose() const;
 
-    [[nodiscard]] std::size_t get_sst_level() const {
-        return sst_level.value();
-    }
+    [[nodiscard]] std::size_t get_sst_level() const;
 
 };
 
