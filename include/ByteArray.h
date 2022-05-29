@@ -13,6 +13,8 @@ public:
     virtual ~ByteArray() = default;
 };
 
+using ByteArrayPtr = ByteArray*;
+
 
 class RAMByteArray : public ByteArray {
 private:
