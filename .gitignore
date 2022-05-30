@@ -6,3 +6,7 @@ cmake-build-debug/
 .idea/
 test
 main
+build/ 
+.vim
+.ccls
+compile_commands.json

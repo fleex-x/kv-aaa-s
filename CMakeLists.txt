@@ -11,6 +11,8 @@ file(GLOB zstd_decompress "libs/zstd/decompress/*.h" "libs/zstd/decompress/*.c" 
 file(GLOB zstd_dict_builder "libs/zstd/dictBuilder/*.h" "libs/zstd/dictBuilder/*.c")
 
 file(GLOB srcs "src/*.cpp")
+file(GLOB headers "include/*.h")
+file(GLOB lib_headers "libs/*.h")
 
 set(zstd ${zstd_common} ${zstd_compress} ${zstd_decompress} ${zstd_dict_builder})
 
@@ -21,4 +23,4 @@ include_directories(libs/include)
 
 add_executable(main main.cpp)
 
-add_executable(test doctest_main.cpp tests.cpp ${srcs})
+add_executable(test doctest_main.cpp tests.cpp ${srcs} ${headers} ${lib_headers})
