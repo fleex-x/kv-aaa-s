@@ -42,14 +42,14 @@ ByteArrayPtr RAMMemoryManager::get_file(MemoryPurpose memory_purpose, std::optio
 ByteArrayPtr RAMMemoryManager::create_file(MemoryPurpose memory_purpose, std::optional<std::size_t> sst_level) {
     MemoryType memory_type(memory_purpose, sst_level);
     assert(memory.count(memory_type) == 0);
-    memory[memory_type] = new RAMByteArray();
+    memory[memory_type] = ::new RAMByteArray();
     return memory[memory_type];
 }
 
 ByteArrayPtr RAMMemoryManager::start_overwrite(MemoryPurpose memory_purpose, std::optional<std::size_t> sst_level) {
     MemoryType memory_type(memory_purpose, sst_level);
     assert(memory_to_overwrite.count(memory_type) == 0);
-    memory_to_overwrite[memory_type] = new RAMByteArray();
+    memory_to_overwrite[memory_type] = ::new RAMByteArray();
     return memory_to_overwrite[memory_type];
 }
 
@@ -74,14 +74,14 @@ ByteArrayPtr RAMMemoryManager::get_file(MemoryPurpose memory_purpose) {
 ByteArrayPtr RAMMemoryManager::create_file(MemoryPurpose memory_purpose) {
     MemoryType memory_type(memory_purpose);
     assert(memory.count(memory_type) == 0);
-    memory[memory_type] = new RAMByteArray();
+    memory[memory_type] = ::new RAMByteArray();
     return memory[memory_type];
 }
 
 ByteArrayPtr RAMMemoryManager::start_overwrite(MemoryPurpose memory_purpose) {
     MemoryType memory_type(memory_purpose);
     assert(memory_to_overwrite.count(memory_type) == 0);
-    memory_to_overwrite[memory_type] = new RAMByteArray();
+    memory_to_overwrite[memory_type] = ::new RAMByteArray();
     return memory_to_overwrite[memory_type];
 }
 

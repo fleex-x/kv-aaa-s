@@ -16,9 +16,10 @@ set(zstd ${zstd_common} ${zstd_compress} ${zstd_decompress} ${zstd_dict_builder}
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic") # TODO add -Werror
 
-include_directories(include)
+
 include_directories(libs/include)
+include_directories(include)
 
 add_executable(main main.cpp)
 
-add_executable(test doctest_main.cpp tests.cpp ${srcs})
+add_executable(test doctest_main.cpp tests.cpp ${srcs} skip_list_tests.cpp)
