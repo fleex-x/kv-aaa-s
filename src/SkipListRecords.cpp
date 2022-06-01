@@ -43,6 +43,11 @@ SLBottomLevelRecord SLBottomLevelRecordViewer::get_record(std::uint64_t ind) {
     return record;
 }
 
+SLBottomLevelRecord SLBottomLevelRecordViewer::operator[](std::uint64_t ind) {
+    return get_record(ind);
+}
+
+
 void SLBottomLevelRecordViewer::append_record(const SLBottomLevelRecord &record) {
     std::vector<ByteType> record_chars(SLBottomLevelRecord::SIZE);
     std::memcpy(record_chars.data() + SLBottomLevelRecord::NEXT_BEGIN,&record.next,  sizeof(record.next));
@@ -97,6 +102,10 @@ SLUpperLevelRecord SLUpperLevelRecordViewer::get_record(std::uint64_t ind) {
     std::memcpy(&record.offset, record_chars.data() + SLUpperLevelRecord::OFFSET_BEGIN, sizeof(record.offset));
     std::memcpy(record.key.data(), record_chars.data() + SLUpperLevelRecord::KEY_BEGIN, sizeof(record.key));
     return record;
+}
+
+SLUpperLevelRecord SLUpperLevelRecordViewer::operator[](std::uint64_t ind) {
+    return get_record(ind);
 }
 
 void SLUpperLevelRecordViewer::append_record(const SLUpperLevelRecord &record) {

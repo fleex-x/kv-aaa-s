@@ -69,7 +69,7 @@ TEST_CASE("SLUpperLevelRecordViewer tests") {
         byte = static_cast<ByteType>('a');
     }
     viewer.append_record(record);
-    CHECK(record == viewer.get_record(0));
+    CHECK(record == viewer[0]);
 
     std::vector<SLUpperLevelRecord> records(SIZE);
     for (std::size_t i = 0; i < SIZE; ++i) {
@@ -84,7 +84,12 @@ TEST_CASE("SLUpperLevelRecordViewer tests") {
         viewer.append_record(record);
     }
     for (std::size_t i = 0; i < SIZE; ++i) {
-        CHECK(viewer.get_record(i + 1) == records[i]);
+        CHECK(viewer[i + 1] == records[i]);
+    }
+
+    for (std::size_t i = 0; i < SIZE; ++i) {
+        heads[i] = rnd();
+        viewer.set_head(i, heads[i]);
     }
 
     for (std::size_t i = 0; i < SIZE; ++i) {

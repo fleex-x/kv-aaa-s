@@ -26,6 +26,7 @@ private:
 public:
     explicit SLBottomLevelRecordViewer(ByteArrayPtr byte_arr_);
     SLBottomLevelRecord get_record(std::uint64_t ind);
+    SLBottomLevelRecord operator[](std::uint64_t ind);
     std::uint64_t get_head();
     void append_record(const SLBottomLevelRecord &record);
     void set_head(std::uint64_t head);
@@ -55,6 +56,7 @@ private:
 public:
     explicit SLUpperLevelRecordViewer(ByteArrayPtr byte_arr_, ByteArrayPtr heads_);
     SLUpperLevelRecord get_record(std::uint64_t ind);
+    SLUpperLevelRecord operator[](std::uint64_t ind);
     void append_record(const SLUpperLevelRecord &record);
     std::uint64_t get_head(std::uint64_t list_ind);
     void set_head(std::uint64_t list_ind, std::uint64_t head);
