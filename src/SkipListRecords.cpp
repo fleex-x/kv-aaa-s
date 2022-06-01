@@ -39,7 +39,7 @@ SLBottomLevelRecord SLBottomLevelRecordViewer::get_record(std::uint64_t ind) {
     SLBottomLevelRecord record;
     std::memcpy(&record.next, record_chars.data() + SLBottomLevelRecord::NEXT_BEGIN, sizeof(record.next));
     std::memcpy(&record.offset, record_chars.data() + SLBottomLevelRecord::OFFSET_BEGIN, sizeof(record.offset));
-    std::memcpy(record.key.data(), record_chars.data() + SLBottomLevelRecord::KEY_BEGIN, sizeof(record.key));
+    std::memcpy(record.key.data(), record_chars.data() + SLBottomLevelRecord::KEY_BEGIN, KEY_SIZE_BYTES);
     return record;
 }
 
@@ -52,7 +52,7 @@ void SLBottomLevelRecordViewer::append_record(const SLBottomLevelRecord &record)
     std::vector<ByteType> record_chars(SLBottomLevelRecord::SIZE);
     std::memcpy(record_chars.data() + SLBottomLevelRecord::NEXT_BEGIN,&record.next,  sizeof(record.next));
     std::memcpy(record_chars.data() + SLBottomLevelRecord::OFFSET_BEGIN, &record.offset, sizeof(record.offset));
-    std::memcpy(record_chars.data() + SLBottomLevelRecord::KEY_BEGIN, record.key.data(), sizeof(record.key));
+    std::memcpy(record_chars.data() + SLBottomLevelRecord::KEY_BEGIN, record.key.data(), KEY_SIZE_BYTES);
     byte_arr->append(record_chars);
 }
 
@@ -100,7 +100,7 @@ SLUpperLevelRecord SLUpperLevelRecordViewer::get_record(std::uint64_t ind) {
     std::memcpy(&record.next, record_chars.data() + SLUpperLevelRecord::NEXT_BEGIN, sizeof(record.next));
     std::memcpy(&record.down, record_chars.data() + SLUpperLevelRecord::DOWN_BEGIN, sizeof(record.down));
     std::memcpy(&record.offset, record_chars.data() + SLUpperLevelRecord::OFFSET_BEGIN, sizeof(record.offset));
-    std::memcpy(record.key.data(), record_chars.data() + SLUpperLevelRecord::KEY_BEGIN, sizeof(record.key));
+    std::memcpy(record.key.data(), record_chars.data() + SLUpperLevelRecord::KEY_BEGIN, KEY_SIZE_BYTES);
     return record;
 }
 
@@ -113,7 +113,7 @@ void SLUpperLevelRecordViewer::append_record(const SLUpperLevelRecord &record) {
     std::memcpy(record_chars.data() + SLUpperLevelRecord::NEXT_BEGIN,&record.next,  sizeof(record.next));
     std::memcpy(record_chars.data() + SLUpperLevelRecord::DOWN_BEGIN,&record.down,  sizeof(record.down));
     std::memcpy(record_chars.data() + SLUpperLevelRecord::OFFSET_BEGIN, &record.offset, sizeof(record.offset));
-    std::memcpy(record_chars.data() + SLUpperLevelRecord::KEY_BEGIN, record.key.data(), sizeof(record.key));
+    std::memcpy(record_chars.data() + SLUpperLevelRecord::KEY_BEGIN, record.key.data(), KEY_SIZE_BYTES);
     byte_arr->append(record_chars);
 }
 

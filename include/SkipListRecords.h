@@ -6,11 +6,10 @@
 namespace kvaaas {
 
 struct SLBottomLevelRecord {
-    static constexpr std::uint64_t KEY_SIZE = KEY_SIZE_BYTES;
     std::uint64_t next = 0;
     std::uint64_t offset = 0;
     KeyType key{};
-    static constexpr std::uint64_t SIZE = sizeof(next) + sizeof(offset) + sizeof(key);
+    static constexpr std::uint64_t SIZE = sizeof(next) + sizeof(offset) + KEY_SIZE_BYTES;
     static constexpr std::uint64_t NEXT_BEGIN = 0;
     static constexpr std::uint64_t OFFSET_BEGIN = sizeof(next);
     static constexpr std::uint64_t KEY_BEGIN = sizeof(next) + sizeof(offset);
@@ -33,12 +32,11 @@ public:
 };
 
 struct SLUpperLevelRecord {
-    static constexpr std::uint64_t KEY_SIZE = KEY_SIZE_BYTES;
     std::uint64_t next = 0;
     std::uint64_t down = 0;
     std::uint64_t offset = 0;
     KeyType key{};
-    static constexpr std::uint64_t SIZE = sizeof(next) +  sizeof(down) + sizeof(offset) + sizeof(key);
+    static constexpr std::uint64_t SIZE = sizeof(next) +  sizeof(down) + sizeof(offset) + KEY_SIZE_BYTES;
     static constexpr std::uint64_t NEXT_BEGIN = 0;
     static constexpr std::uint64_t DOWN_BEGIN = sizeof(down);
     static constexpr std::uint64_t OFFSET_BEGIN = sizeof(down) + sizeof(next);
