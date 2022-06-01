@@ -5,6 +5,17 @@
 
 using namespace kvaaas;
 
+namespace {
+    std::vector<ByteType> bytes(std::initializer_list<unsigned char> bytes) {
+        std::vector<ByteType> res(bytes.size());
+        auto it = bytes.begin();
+        for (std::size_t i = 0; i < bytes.size(); ++i, ++it) {
+            res[i] = static_cast<ByteType>(*it);
+        }
+        return res;
+    }
+}
+
 TEST_CASE("Simple test") {
     MemoryType mt(MemoryPurpose::SST, 4);
     CHECK(mt.get_sst_level() == 4);
@@ -15,15 +26,15 @@ TEST_CASE("RAMByteArray") {
     RAMByteArray ram_arr;
     ByteArray &arr = ram_arr;
     CHECK(arr.size() == 0);
-    arr.append({0, 1, 2, 3});
+    arr.append(bytes({0, 1, 2, 3}));
     CHECK(arr.size() == 4);
-    CHECK(arr.read(0, 1) == std::vector<unsigned char>({0}));
-    CHECK(arr.read(0, 4) == std::vector<unsigned char>({0, 1, 2, 3}));
-    CHECK(arr.read(3, 4) == std::vector<unsigned char>({3}));
-    CHECK(arr.read(3, 4) == std::vector<unsigned char>({3}));
-    arr.append({3, 4, 5});
+    CHECK(arr.read(0, 1) == bytes({0}));
+    CHECK(arr.read(0, 4) == bytes({0, 1, 2, 3}));
+    CHECK(arr.read(3, 4) == bytes({3}));
+    CHECK(arr.read(3, 4) == bytes({3}));
+    arr.append(bytes({3, 4, 5}));
     CHECK(arr.size() == 7);
-    CHECK(arr.read(3, 7) == std::vector<unsigned char>({3, 3, 4, 5}));
+    CHECK(arr.read(3, 7) == bytes({3, 3, 4, 5}));
 }
 
 TEST_CASE("RAMMemoryManager non-copyable") {
@@ -54,21 +65,21 @@ TEST_CASE("RAMMemoryManager simple") {
         CHECK(sst[i] == memory_manager.get_file(MemoryPurpose::SST, i));
     }
 
-    sst[2]->append({3, 4, 5});
-    CHECK(memory_manager.get_file(MemoryPurpose::SST, 2)->read(0, 3) == std::vector<unsigned char>({3, 4, 5}));
+    sst[2]->append(bytes({3, 4, 5}));
+    CHECK(memory_manager.get_file(MemoryPurpose::SST, 2)->read(0, 3) == bytes({3, 4, 5}));
 
-    kvs->append({1, 2, 3});
+    kvs->append(bytes({1, 2, 3}));
     ByteArrayPtr new_kvs = memory_manager.start_overwrite(MemoryPurpose::KVS);
-    new_kvs->append({3, 4, 6});
+    new_kvs->append(bytes({3, 4, 6}));
     memory_manager.end_overwrite(MemoryPurpose::KVS);
     CHECK(new_kvs == memory_manager.get_file(MemoryPurpose::KVS));
-    CHECK(new_kvs->read(1, 2) == std::vector<unsigned char>({4}));
+    CHECK(new_kvs->read(1, 2) == bytes({4}));
 
     new_kvs = memory_manager.start_overwrite(MemoryPurpose::KVS);
-    new_kvs->append({6, 7, 8});
+    new_kvs->append(bytes({6, 7, 8}));
     memory_manager.end_overwrite(MemoryPurpose::KVS);
     CHECK(new_kvs == memory_manager.get_file(MemoryPurpose::KVS));
-    CHECK(new_kvs->read(0, 3) == std::vector<unsigned char>({6, 7, 8}));
+    CHECK(new_kvs->read(0, 3) == bytes({6, 7, 8}));
 }
 
 TEST_CASE("RAMMemoryManager move-constructor") {
@@ -91,20 +102,20 @@ TEST_CASE("RAMMemoryManager move-constructor") {
             CHECK(sst[i] == memory_manager.get_file(MemoryPurpose::SST, i));
         }
 
-        sst[2]->append({3, 4, 5});
-        CHECK(memory_manager.get_file(MemoryPurpose::SST, 2)->read(0, 3) == std::vector<unsigned char>({3, 4, 5}));
+        sst[2]->append(bytes({3, 4, 5}));
+        CHECK(memory_manager.get_file(MemoryPurpose::SST, 2)->read(0, 3) == bytes({3, 4, 5}));
 
         ByteArrayPtr new_sst_2 = memory_manager.start_overwrite(MemoryPurpose::SST, 2);
 
-        new_sst_2->append({3, 4, 6});
+        new_sst_2->append(bytes({3, 4, 6}));
         memory_manager.end_overwrite(MemoryPurpose::SST, 2);
         CHECK(new_sst_2 == memory_manager.get_file(MemoryPurpose::SST, 2));
-        CHECK(new_sst_2->read(1, 2) == std::vector<unsigned char>({4}));
+        CHECK(new_sst_2->read(1, 2) == bytes({4}));
 
         new_sst_2 = memory_manager.start_overwrite(MemoryPurpose::SST, 2);
-        new_sst_2->append({6, 7, 8});
+        new_sst_2->append(bytes({6, 7, 8}));
         memory_manager.end_overwrite(MemoryPurpose::SST, 2);
         CHECK(new_sst_2 == memory_manager.get_file(MemoryPurpose::SST, 2));
-        CHECK(new_sst_2->read(0, 3) == std::vector<unsigned char>({6, 7, 8}));
+        CHECK(new_sst_2->read(0, 3) == bytes({6, 7, 8}));
     }
 }
