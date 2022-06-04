@@ -28,3 +28,4 @@ add_executable(main main.cpp)
 
 add_executable(test ${tests} ${srcs} ${headers} ${lib_headers})
 add_executable(KVSRecordsTest tests/doctest_main.cpp tests/KVSRecords_test.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers})
+add_executable(FileByteArrayTest tests/doctest_main.cpp tests/FileByteArray_tests.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers})

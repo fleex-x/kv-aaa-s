@@ -1,5 +1,6 @@
 #include "ByteArray.h"
 #include "Core.h"
+#include <filesystem>
 
 namespace kvaaas {
 
@@ -20,10 +21,17 @@ std::vector<ByteType> RAMByteArray::read(std::size_t l, std::size_t r) {
 
 std::size_t RAMByteArray::size() { return byte_array.size(); }
 
-FileByteArray::FileByteArray(const std::string &s)
-    : data(s, std::ios::binary | std::ios::in | std::ios::out) {}
+FileByteArray::FileByteArray(const std::string &s) {
+  if (std::filesystem::exists(s)) {
+    data.open(s, std::fstream::ate | std::fstream::binary | std::fstream ::in |
+                std::fstream::out);
+  } else {
+    data.open(s, std::fstream::trunc | std::fstream::binary | std::fstream ::in |
+                     std::fstream::out);
+  }
+}
 
-void FileByteArray::append(const std::vector<ByteType> &bytes) {
+    void FileByteArray::append(const std::vector<ByteType> &bytes) {
   data.write(
       reinterpret_cast<const char *>(bytes.data()),
       bytes.size()); /// TODO Где-то здесь потенциально много ошибок вылетает
@@ -39,9 +47,10 @@ void FileByteArray::rewrite(std::size_t begin,
 std::vector<ByteType> FileByteArray::read(std::size_t l, std::size_t r) {
   auto pos = data.tellp();
   data.seekp(l); /// -_-
-  std::vector<ByteType> byte_array;
-  data.get(reinterpret_cast<char *>(byte_array.data()), r - l);
+  std::vector<ByteType> byte_array(r - l);
+  data.read(reinterpret_cast<char *>(byte_array.data()), r - l);
   data.seekp(pos);
+  return byte_array;
 }
 
 std::size_t FileByteArray::size() { return data.tellg(); }

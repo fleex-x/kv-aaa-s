@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstddef>
+#include <vector>
 
 namespace kvaaas {
 	constexpr std::size_t KEY_SIZE_BITS = 128; // TODO read in config
