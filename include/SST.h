@@ -12,9 +12,9 @@ namespace kvaaas {
 struct SSTRecord {
   KeyType key{};
   std::uint64_t offset;
-  bool operator<(SSTRecord oth) const {
-    return key < oth.key;
-  }
+  bool operator<(SSTRecord oth) const { return key < oth.key; }
+  bool operator==(SSTRecord oth) const { return key == oth.key; }
+  bool operator!=(SSTRecord oth) const { return key != oth.key; }
 };
 
 struct NewSSTRV {};
@@ -22,7 +22,8 @@ struct RebuildSSTRV {};
 
 struct SSTRecordViewer {
   SSTRecordViewer(ByteArrayPtr data, NewSSTRV) : _data(data) {}
-  void append(SSTRecord rec) {
+
+  void append(const SSTRecord &rec) {
     std::vector<ByteType> vec(rec.key.size() + sizeof(std::uint64_t));
     std::copy(rec.key.begin(), rec.key.end(), vec.begin());
     std::memcpy(vec.data() + rec.key.size(), &rec.offset,
@@ -44,41 +45,46 @@ struct SSTRecordViewer {
   // TODO(mkornaukhov03)
   // support rebuild from byte array
   SSTRecordViewer(ByteArrayPtr data, RebuildSSTRV) : _data(data) {}
-  void store_size() {
-    // write _size pn disk
+
+  std::uint64_t size() const noexcept {
+    return _data->size() / (sizeof(std::uint64_t) + KEY_SIZE_BYTES);
   }
 
-  void reset_size(std::size_t new_size) { _size = new_size; }
-  std::uint64_t size() { return _size; }
+  bool same_layout(const SSTRecordViewer &oth) { return _data == oth._data; }
 
 private:
-  std::uint64_t _size;
   ByteArrayPtr _data;
 };
 
 struct SST {
 
-  explicit SST(SSTRecordViewer rec_viewer) : _rec_view(rec_viewer) {}
+  explicit SST(SSTRecordViewer rec_viewer) : _rec_view(std::move(rec_viewer)) {}
 
-  struct Iterator {
+  struct iterator {
     using value_type = SSTRecord;
 
-    Iterator(SSTRecordViewer view, std::uint64_t index)
+    iterator(SSTRecordViewer view, std::uint64_t index)
         : _view(view), _index(index) {}
 
-    const value_type operator*() {
-      return _view.get_record(_index);
-    }
+    const value_type operator*() { return _view.get_record(_index); }
 
-    Iterator& operator++() {
+    iterator &operator++() {
       _index++;
       return *this;
     }
 
-    Iterator operator++(int) {
-      Iterator tmp = *this;
+    iterator operator++(int) {
+      iterator iterator = *this;
       ++(*this);
-      return tmp;
+      return iterator;
+    }
+
+    bool operator==(const iterator &oth) {
+      return _view.same_layout(oth._view) && _index == oth._index;
+    }
+
+    bool operator!=(const iterator &oth) {
+      return !(*this == oth);
     }
 
   private:
@@ -86,13 +92,11 @@ struct SST {
     std::uint64_t _index;
   };
 
-  Iterator begin() {
-    return Iterator(_rec_view, 0);
-  }
+  iterator begin() { return iterator(_rec_view, 0); }
 
-  Iterator end() {
-    return Iterator(_rec_view, _rec_view.size());
-  }
+  iterator end() { return iterator(_rec_view, _rec_view.size()); }
+
+  std::uint64_t size() const noexcept { return _rec_view.size(); }
 
   size_t find_offset(const KeyType &key) {
     // find record
@@ -115,23 +119,29 @@ struct SST {
     return rec.offset;
   }
 
-  template<typename It1, typename It2>
-  static SST merge_into_sst(It1 begin1, It1 end1, It2 begin2, It2 end2, SSTRecordViewer viewer) {
+  template <typename It1, typename It2>
+  static SST merge_into_sst(It1 begin1, It1 end1, It2 begin2, It2 end2,
+                            SSTRecordViewer viewer) {
     if (viewer.size() != 0) {
       std::cerr << "Assume viewer size for merge = 0!" << std::endl;
     }
+
     while (begin1 != end1 && begin2 != end2) {
       const SSTRecord first = *begin1;
       const SSTRecord second = *begin2;
       if (first < second) {
         viewer.append(first);
         ++begin1;
-      }
-      else {
+      } else if (second < first) {
         viewer.append(second);
         ++begin2;
+      } else {
+        viewer.append(first);
+        ++begin1;
+        ++begin2;
       }
-    } 
+    }
+    return SST(viewer);
   }
 
 private:
