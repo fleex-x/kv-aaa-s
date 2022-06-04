@@ -15,7 +15,7 @@ TEST_CASE("SSTRecordsViewer") {
   viewer.append(rec);
 
   CHECK(viewer.size() == 1);
- 
+
   CHECK(rec == viewer.get_record(0));
 
   rec.offset = 1234;
@@ -39,11 +39,10 @@ TEST_CASE("SSTJustWorks") {
   rec.key = {std::byte(1), std::byte(1), std::byte(1)};
   viewer.append(rec);
 
-
   SST sst(viewer);
-  CHECK(sst.find_offset({std::byte{0}, std::byte{0}, std::byte{0}}) == 100); 
-  CHECK(sst.find_offset({std::byte{1}, std::byte{1}, std::byte{1}}) == 1234); 
-  CHECK(!(sst.begin() == sst.end())); 
+  CHECK(sst.find_offset({std::byte{0}, std::byte{0}, std::byte{0}}) == 100);
+  CHECK(sst.find_offset({std::byte{1}, std::byte{1}, std::byte{1}}) == 1234);
+  CHECK(sst.begin() != sst.end());
 }
 
 TEST_CASE("SSTEmpty") {
@@ -51,13 +50,14 @@ TEST_CASE("SSTEmpty") {
   SSTRecordViewer viewer(&arr, NewSSTRV{});
 
   SST sst(viewer);
-  CHECK(sst.begin() == sst.end()); 
+  CHECK(sst.begin() == sst.end());
 }
 
 TEST_CASE("SSTMerge") {
   RAMByteArray arr1, arr2, arr3;
-  SSTRecordViewer view1(&arr1, NewSSTRV{}), view2(&arr2, NewSSTRV{}), view3(&arr3, NewSSTRV{});
-  
+  SSTRecordViewer view1(&arr1, NewSSTRV{}), view2(&arr2, NewSSTRV{}),
+      view3(&arr3, NewSSTRV{});
+
   auto z = std::byte(0);
   auto t = std::byte(2);
 
@@ -68,7 +68,7 @@ TEST_CASE("SSTMerge") {
   rec.key = {z};
   view1.append(rec);
 
-  rec.offset = 2; 
+  rec.offset = 2;
   rec.key = {z, z};
   view1.append(rec);
 
@@ -81,7 +81,7 @@ TEST_CASE("SSTMerge") {
   rec.key = {t};
   view2.append(rec);
 
-  rec.offset = 4; 
+  rec.offset = 4;
   rec.key = {t, t};
   view2.append(rec);
 
@@ -90,19 +90,19 @@ TEST_CASE("SSTMerge") {
   view2.append(rec);
 
   SST sst1(view1), sst2(view2);
-  SST sst3 = SST::merge_into_sst(sst1.begin(), sst1.end(), sst2.begin(), sst2.end(), view3);
+  SST sst3 = SST::merge_into_sst(sst1.begin(), sst1.end(), sst2.begin(),
+                                 sst2.end(), view3);
   CHECK(sst3.size() == 5);
-  
-  KeyType keys[5] = {{z}, {z, z}, {t}, {t,t}, {t,t,t,t}};
+
+  KeyType keys[5] = {{z}, {z, z}, {t}, {t, t}, {t, t, t, t}};
   std::uint64_t offsets[5] = {1, 2, 3, 4, 5};
-  
+
   int i = 0;
   for (auto iter = sst3.begin(); iter != sst3.end(); ++iter, ++i) {
     const SSTRecord rec = *iter;
     CHECK(rec.key == keys[i]);
     CHECK(rec.offset == offsets[i]);
-  } 
+  }
 }
-
 
 } // namespace
