@@ -4,7 +4,7 @@
 #include "Core.h"
 #include <algorithm>
 #include <vector>
-
+#include <cstring>
 #include <iostream> // for debug, remove later
 
 namespace kvaaas {
