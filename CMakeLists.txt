@@ -14,8 +14,7 @@ file(GLOB srcs "src/*.cpp")
 file(GLOB tests "tests/*.cpp")
 file(GLOB headers "include/*.h")
 file(GLOB lib_headers "libs/include/*.h")
-file(GLOB lib_cpp_srcs "libs/*.cpp")
-file(GLOB lib_c_srcs "libs/src/xxhash.c")
+file(GLOB lib_cpp_srcs "libs/src/*.cpp")
 
 set(zstd ${zstd_common} ${zstd_compress} ${zstd_decompress} ${zstd_dict_builder})
 
@@ -27,5 +26,5 @@ include_directories(include)
 
 add_executable(main main.cpp)
 
-add_executable(test ${tests} ${srcs} ${headers} ${lib_headers} ${lib_c_srcs} ${lib_cpp_srcs})
+add_executable(test ${tests} ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 
