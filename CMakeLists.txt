@@ -13,7 +13,8 @@ file(GLOB zstd_dict_builder "libs/zstd/dictBuilder/*.h" "libs/zstd/dictBuilder/*
 file(GLOB srcs "src/*.cpp")
 file(GLOB tests "tests/*.cpp")
 file(GLOB headers "include/*.h")
-file(GLOB lib_headers "libs/*.h")
+file(GLOB lib_headers "libs/include/*.h")
+file(GLOB lib_cpp_srcs "libs/src/*.cpp")
 
 set(zstd ${zstd_common} ${zstd_compress} ${zstd_decompress} ${zstd_dict_builder})
 
@@ -25,4 +26,5 @@ include_directories(include)
 
 add_executable(main main.cpp)
 
-add_executable(test ${tests} ${srcs} ${headers} ${lib_headers})
+add_executable(test ${tests} ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
+
