@@ -23,8 +23,8 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic") # TODO add -Werror
 include_directories(libs/include)
 include_directories(include)
 
-add_compile_options(-fsanitize=address -fsanitize=undefined)
-add_link_options(-fsanitize=address -fsanitize=undefined)
+#add_compile_options(-fsanitize=address -fsanitize=undefined)
+#add_link_options(-fsanitize=address -fsanitize=undefined)
 
 add_executable(main main.cpp)
 
