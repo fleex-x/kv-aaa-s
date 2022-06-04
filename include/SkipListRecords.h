@@ -19,9 +19,11 @@ struct SLBottomLevelRecord {
     static constexpr std::uint64_t NEXT_BEGIN = 0;
     static constexpr std::uint64_t OFFSET_BEGIN = sizeof(next);
     static constexpr std::uint64_t KEY_BEGIN = sizeof(next) + sizeof(offset);
+
 };
 
-bool operator==(const SLBottomLevelRecord &record1,const SLBottomLevelRecord &record2);
+bool operator==(const SLBottomLevelRecord &record1,
+                const SLBottomLevelRecord &record2);
 
 class SLBottomLevelRecordViewer {
 private:
@@ -53,9 +55,11 @@ struct SLUpperLevelRecord {
     static constexpr std::uint64_t DOWN_BEGIN = sizeof(down);
     static constexpr std::uint64_t OFFSET_BEGIN = sizeof(down) + sizeof(next);
     static constexpr std::uint64_t KEY_BEGIN = sizeof(down) + sizeof(next) + sizeof(offset);
+
 };
 
-bool operator==(const SLUpperLevelRecord &record1,const SLUpperLevelRecord &record2);
+bool operator==(const SLUpperLevelRecord &record1,
+                const SLUpperLevelRecord &record2);
 
 class SLUpperLevelRecordViewer {
 private:
@@ -78,4 +82,4 @@ public:
     void append_head(std::uint64_t head);
 };
 
-}
+} // namespace kvaaas
