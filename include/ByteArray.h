@@ -1,35 +1,55 @@
 #pragma once
-#include <vector>
 #include "Core.h"
+#include <vector>
+#include <fstream>
 
 namespace kvaaas {
 
 class ByteArray {
 public:
-    virtual void append(const std::vector<ByteType> &bytes) = 0;
+  virtual void append(const std::vector<ByteType> &bytes) = 0;
 
-    virtual std::vector<ByteType> read(std::size_t l, std::size_t r) = 0; //[l, r) -- semi-interval
-    virtual void rewrite(std::size_t begin, const std::vector<ByteType> &bytes) = 0;
-    virtual std::size_t size() = 0;
+  virtual std::vector<ByteType>
+  read(std::size_t l, std::size_t r) = 0; //[l, r) -- semi-interval
+  virtual void rewrite(std::size_t begin,
+                       const std::vector<ByteType> &bytes) = 0;
+  virtual std::size_t size() = 0;
 
-    virtual ~ByteArray() = default;
+  virtual ~ByteArray() = default;
 };
 
-using ByteArrayPtr = ByteArray*;
-
+using ByteArrayPtr = ByteArray *;
 
 class RAMByteArray : public ByteArray {
 private:
-    std::vector<ByteType> byte_array;
+  std::vector<ByteType> byte_array;
+
 public:
+  void append(const std::vector<ByteType> &bytes) override;
 
-    void append(const std::vector<ByteType> &bytes) override;
+  std::vector<ByteType> read(std::size_t l, std::size_t r) override;
 
-    std::vector<ByteType> read(std::size_t l, std::size_t r) override;
+  void rewrite(std::size_t begin, const std::vector<ByteType> &bytes) override;
 
-    void rewrite(std::size_t begin, const std::vector<ByteType> &bytes) override;
-
-    std::size_t size() override;
+  std::size_t size() override;
 };
 
-}
+class FileByteArray : public ByteArray {
+private:
+  std::fstream data;
+
+public:
+
+  FileByteArray(const std::string &s);
+
+  void append(const std::vector<ByteType> &bytes) override;
+
+  std::vector<ByteType> read(std::size_t l,
+                             std::size_t r) override; //[l, r) -- semi-interval
+  void rewrite(std::size_t begin, const std::vector<ByteType> &bytes) override;
+
+  std::size_t size() override;
+
+  ~FileByteArray();
+};
+} // namespace kvaaas
