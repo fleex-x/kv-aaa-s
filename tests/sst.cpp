@@ -89,13 +89,17 @@ TEST_CASE("SSTMerge") {
   rec.key = {t, t, t, t};
   view2.append(rec);
 
+  rec.offset = 6;
+  rec.key = {t, t, t, t, t, t, t,};
+  view2.append(rec);
+
   SST sst1(view1), sst2(view2);
   SST sst3 = SST::merge_into_sst(sst1.begin(), sst1.end(), sst2.begin(),
                                  sst2.end(), view3);
-  CHECK(sst3.size() == 5);
+  CHECK(sst3.size() == 6);
 
-  KeyType keys[5] = {{z}, {z, z}, {t}, {t, t}, {t, t, t, t}};
-  std::uint64_t offsets[5] = {1, 2, 3, 4, 5};
+  KeyType keys[] = {{z}, {z, z}, {t}, {t, t}, {t, t, t, t}, {t, t, t, t, t, t, t}};
+  std::uint64_t offsets[] = {1, 2, 3, 4, 5, 6};
 
   int i = 0;
   for (auto iter = sst3.begin(); iter != sst3.end(); ++iter, ++i) {

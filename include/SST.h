@@ -141,6 +141,12 @@ struct SST {
         ++begin2;
       }
     }
+    while (begin1 != end1) {
+      viewer.append(*begin1++);
+    }
+    while (begin2 != end2) {
+      viewer.append(*begin2++);
+    }
     return SST(viewer);
   }
 
