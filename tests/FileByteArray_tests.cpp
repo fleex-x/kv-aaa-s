@@ -96,6 +96,20 @@ TEST_CASE("Rewrite") {
   CHECK(arr.read(0, startArr.size()) != startArr);
 
   arr.rewrite(l, changedArr);
+  CHECK(arr.size() == startArr.size());
 
   CHECK(startArr == arr.read(0, startArr.size()));
+
+  CHECK(arr.size() == startArr.size());
+}
+
+TEST_CASE("Size") {
+  FileByteArray arr("fileArray");
+  auto testArr = genRandom(10000);
+  arr.append(testArr);
+  CHECK(arr.size() == 10000);
+
+  arr.append(testArr);
+  CHECK(arr.size() == 20000);
+
 }

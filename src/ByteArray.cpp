@@ -39,21 +39,19 @@ FileByteArray::FileByteArray(const std::string &s) {
 
 void FileByteArray::rewrite(std::size_t begin,
                             const std::vector<ByteType> &bytes) {
-  auto pos = data.tellp();
   data.seekp(begin); /// И здесь тоже
   data.write(reinterpret_cast<const char *>(bytes.data()), bytes.size());
-  data.seekp(pos);
+  data.seekp(0, std::fstream::end);
 }
 std::vector<ByteType> FileByteArray::read(std::size_t l, std::size_t r) {
-  auto pos = data.tellp();
   data.seekp(l); /// -_-
   std::vector<ByteType> byte_array(r - l);
   data.read(reinterpret_cast<char *>(byte_array.data()), r - l);
-  data.seekp(pos);
+  data.seekp(0, std::fstream::end);
   return byte_array;
 }
 
-std::size_t FileByteArray::size() { return data.tellg(); }
+std::size_t FileByteArray::size() { return data.tellp(); }
 
 FileByteArray::~FileByteArray() { data.close(); }
 
