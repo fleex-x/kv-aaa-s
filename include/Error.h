@@ -3,19 +3,18 @@
 
 namespace kvaaas {
 
-enum class ErrorStatus {
-    DISK_READING_ERROR = 0
-};
+enum class ErrorStatus { DISK_READING_ERROR = 0 };
 
 class Error {
 private:
-    ErrorStatus status;
+  ErrorStatus status;
+
 public:
-    explicit Error(ErrorStatus status_);
+  explicit Error(ErrorStatus status_);
 
-    std::string to_string();
+  std::string to_string();
 
-    ErrorStatus get_status();
+  ErrorStatus get_status();
 };
 
-}
+} // namespace kvaaas

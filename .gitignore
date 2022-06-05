@@ -6,6 +6,7 @@ cmake-build-debug/
 .idea/
 test
 main
+sanitizer-test
 build/ 
 .vim
 .ccls
