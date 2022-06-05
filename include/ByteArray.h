@@ -39,6 +39,7 @@ public:
 class FileByteArray final : public ByteArray {
 private:
   std::fstream data;
+  std::string file_name;
 
 public:
   explicit FileByteArray(const std::string &s);
