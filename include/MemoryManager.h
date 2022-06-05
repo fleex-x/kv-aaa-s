@@ -10,13 +10,13 @@
 namespace kvaaas {
 
 enum MemoryPurpose {
-  BEGIN=0,
+  BEGIN = 0,
   KVS = 0,
   SST = 1,
   SKIP_LIST_UL = 2,
   SKIP_LIST_BL = 3,
   SKIP_LIST_UL_H = 4,
-  END=5,
+  END = 5,
 };
 
 inline std::string to_string(MemoryPurpose p) {
@@ -127,19 +127,19 @@ public:
   ~RAMMemoryManager() noexcept override;
 };
 
-struct Upload{};
+struct Upload {};
 
 class FileMemoryManager : public MemoryManager {
 private:
-  std::map<MemoryType, ByteArrayPtr, cmp_memory_type_type> memory{
+  std::map<MemoryType, FileByteArrayPtr, cmp_memory_type_type> memory{
       cmp_memory_type};
-  std::map<MemoryType, ByteArrayPtr, cmp_memory_type_type> memory_to_overwrite{
+  std::map<MemoryType, FileByteArrayPtr, cmp_memory_type_type> memory_to_overwrite{
       cmp_memory_type};
 
 public:
   FileMemoryManager(std::string root);
   FileMemoryManager(Upload, std::string root);
-  FileMemoryManager(nlohmann::json mem_json, nlohmann::json mem_to_ov, std::string root);
+  FileMemoryManager(nlohmann::json mem_json, std::string root);
   FileMemoryManager(const FileMemoryManager &) = delete;
   FileMemoryManager &operator=(const FileMemoryManager &) = delete;
   FileMemoryManager(FileMemoryManager &&) = default;
@@ -177,9 +177,7 @@ public:
 private:
   std::string generate_new_filename(MemoryPurpose);
   std::string root;
-  nlohmann::json memory_json;
-  nlohmann::json memory_to_overwrite_json;
-  std::uint64_t _cnt = 0;
+  nlohmann::json memory_json; // assume it cannot down during overwriting
 };
 
 } // namespace kvaaas

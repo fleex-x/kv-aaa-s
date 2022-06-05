@@ -2,6 +2,7 @@
 #include "ByteArray.h"
 #include <cassert>
 #include <optional>
+#include <random>
 #include <vector>
 
 #include "json.hpp"
@@ -112,27 +113,34 @@ RAMMemoryManager::~RAMMemoryManager() noexcept {
 
 // FileMemoryManager
 
-FileMemoryManager::FileMemoryManager(std::string root) : root(root) {
+FileMemoryManager::FileMemoryManager(std::string root)
+    : root(root), memory_json() {}
 
+// TODO do not support sst level yet
+FileMemoryManager::FileMemoryManager(nlohmann::json mem_json, std::string root)
+    : root(root), memory_json(mem_json) {
+  // restore mapping from json
+  for (int i = MemoryPurpose::BEGIN; i < MemoryPurpose::END; ++i) {
+    std::string purpose_name = to_string(MemoryPurpose(i));
+    std::string fname = memory_json.at(purpose_name); // maybe error
+    memory[MemoryType(MemoryPurpose(i))] = ::new FileByteArray(fname);
+  }
 }
-
-
-FileMemoryManager::FileMemoryManager(nlohmann::json mem_json, nlohmann::json mem_to_ov, std::string root) {
-  
-}
-
 
 std::string FileMemoryManager::generate_new_filename(MemoryPurpose mp) {
-  return root + "/file" + to_string(mp) + std::to_string(_cnt++);
+  static std::random_device rd;
+  static std::mt19937 mt(rd());
+  static std::uniform_int_distribution<std::uint64_t> dist;
+  return root + "/file" + to_string(mp) + std::to_string(dist(mt));
 }
 
-ByteArrayPtr FileMemoryManager::get_file(MemoryPurpose memory_purpose,
+[[deprecated]] ByteArrayPtr FileMemoryManager::get_file(MemoryPurpose memory_purpose,
                                          std::optional<std::size_t> sst_level) {
   MemoryType memory_type(memory_purpose, sst_level);
   return memory.at(memory_type);
 }
 
-ByteArrayPtr
+[[deprecated]] ByteArrayPtr
 FileMemoryManager::create_file(MemoryPurpose memory_purpose,
                                std::optional<std::size_t> sst_level) {
   MemoryType memory_type(memory_purpose, sst_level);
@@ -143,7 +151,7 @@ FileMemoryManager::create_file(MemoryPurpose memory_purpose,
   return memory[memory_type];
 }
 
-ByteArrayPtr
+[[deprecated]] ByteArrayPtr
 FileMemoryManager::start_overwrite(MemoryPurpose memory_purpose,
                                    std::optional<std::size_t> sst_level) {
   MemoryType memory_type(memory_purpose, sst_level);
@@ -153,16 +161,18 @@ FileMemoryManager::start_overwrite(MemoryPurpose memory_purpose,
   return memory_to_overwrite[memory_type];
 }
 
-void FileMemoryManager::end_overwrite(MemoryPurpose memory_purpose,
-                                      std::optional<std::size_t> sst_level) {
+[[deprecated]] void
+FileMemoryManager::end_overwrite(MemoryPurpose memory_purpose,
+                                 std::optional<std::size_t> sst_level) {
   MemoryType memory_type(memory_purpose, sst_level);
   delete memory[memory_type];
   memory[memory_type] = memory_to_overwrite[memory_type];
   memory_to_overwrite.erase(memory_type);
 }
 
-void FileMemoryManager::remove(MemoryPurpose memory_purpose,
-                               std::optional<std::size_t> sst_level) {
+[[deprecated]] void
+FileMemoryManager::remove(MemoryPurpose memory_purpose,
+                          std::optional<std::size_t> sst_level) {
   MemoryType memory_type(memory_purpose, sst_level);
   delete memory[memory_type];
   memory.erase(memory_type);
@@ -176,8 +186,9 @@ ByteArrayPtr FileMemoryManager::get_file(MemoryPurpose memory_purpose) {
 ByteArrayPtr FileMemoryManager::create_file(MemoryPurpose memory_purpose) {
   MemoryType memory_type(memory_purpose);
   assert(memory.count(memory_type) == 0);
-  memory[memory_type] =
-      ::new FileByteArray(generate_new_filename(memory_purpose));
+  std::string fname = generate_new_filename(memory_purpose);
+  memory[memory_type] = ::new FileByteArray(fname);
+  memory_json[to_string(memory_purpose)] = fname;
   return memory[memory_type];
 }
 
@@ -193,11 +204,13 @@ void FileMemoryManager::end_overwrite(MemoryPurpose memory_purpose) {
   MemoryType memory_type(memory_purpose);
   delete memory[memory_type];
   memory[memory_type] = memory_to_overwrite[memory_type];
+  memory_json[to_string(memory_purpose)] = memory[memory_type]->file_name();
   memory_to_overwrite.erase(memory_type);
 }
 
 void FileMemoryManager::remove(MemoryPurpose memory_purpose) {
   MemoryType memory_type(memory_purpose);
+  memory_json.erase(to_string(memory_purpose));
   delete memory[memory_type];
   memory.erase(memory_type);
 }
@@ -211,22 +224,15 @@ FileMemoryManager::~FileMemoryManager() noexcept {
   }
 }
 
-
 static FileMemoryManager from_file(std::string root) {
   using namespace nlohmann;
-  std::string mem_name = root + "/" + "mememory.json";
-  std::string mem_to_overwrite_name = root + "/" + "mememory_to_overwrite.json";
- 
+  std::string mem_name = root + "/" + "manifest.json";
+
   std::ifstream imem(mem_name);
   nlohmann::json memory_json;
   imem >> memory_json;
 
-  imem = std::ifstream(mem_to_overwrite_name);
-  nlohmann::json memory_to_ov_json;
-  imem >> memory_to_ov_json;
-
-
-  return FileMemoryManager(memory_json, memory_to_ov_json,root);
+  return FileMemoryManager(memory_json, root);
 }
 
 } // namespace kvaaas

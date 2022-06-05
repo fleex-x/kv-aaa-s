@@ -20,7 +20,6 @@ public:
   virtual ~ByteArray() = default;
 };
 
-using ByteArrayPtr = ByteArray *;
 
 class RAMByteArray : public ByteArray {
 private:
@@ -52,5 +51,15 @@ public:
   std::size_t size() override;
 
   ~FileByteArray() override;
+
+  std::string file_name() const noexcept {
+    return underlying_file;
+  }
+private:
+  std::string underlying_file;
 };
+
+using ByteArrayPtr = ByteArray *;
+using FileByteArrayPtr = FileByteArray*;
+
 } // namespace kvaaas
