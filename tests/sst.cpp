@@ -181,7 +181,7 @@ TEST_CASE("SSTRecordViewerRebuild") {
   view.append(rec2);
 
   CHECK(view.size() == 2);
-  
+
   SSTRecordViewer view2(&arr, RebuildSSTRV{});
   CHECK(view2.size() == view.size());
   CHECK(view2.get_record(0) == rec);

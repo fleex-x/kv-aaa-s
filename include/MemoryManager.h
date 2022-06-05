@@ -34,6 +34,7 @@ inline std::string to_string(MemoryPurpose p) {
   default:
     std::cerr << "Unreachable! Incorrect MemoryPurpose!";
   }
+  return "";
 }
 
 class MemoryType {
@@ -133,8 +134,8 @@ class FileMemoryManager : public MemoryManager {
 private:
   std::map<MemoryType, FileByteArrayPtr, cmp_memory_type_type> memory{
       cmp_memory_type};
-  std::map<MemoryType, FileByteArrayPtr, cmp_memory_type_type> memory_to_overwrite{
-      cmp_memory_type};
+  std::map<MemoryType, FileByteArrayPtr, cmp_memory_type_type>
+      memory_to_overwrite{cmp_memory_type};
 
 public:
   FileMemoryManager(std::string root);
@@ -176,8 +177,12 @@ public:
 
 private:
   std::string generate_new_filename(MemoryPurpose);
+  inline void update_manifest() {
+    std::ofstream os(root + "/manifest.json");
+    os << manifest_json;
+  };
   std::string root;
-  nlohmann::json memory_json; // assume it cannot down during overwriting
+  nlohmann::json manifest_json; // assume it cannot down during overwriting
 };
 
 } // namespace kvaaas

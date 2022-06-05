@@ -1,6 +1,6 @@
+#include "BloomFilter.h"
 #include "ByteArray.h"
 #include "MemoryManager.h"
-#include "BloomFilter.h"
 #include "doctest.h"
 #include <memory>
 
@@ -129,7 +129,7 @@ TEST_CASE("RAMMemoryManager move-constructor") {
 }
 
 TEST_CASE("BloomFilter") {
-  BloomFilter filter(100); 
+  BloomFilter filter(100);
   KeyType key1 = KeyType{std::byte(1), std::byte(2), std::byte(3)};
   KeyType key2 = KeyType{std::byte(4), std::byte(5), std::byte(6)};
   filter.add(key1);

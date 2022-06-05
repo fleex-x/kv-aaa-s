@@ -114,17 +114,18 @@ RAMMemoryManager::~RAMMemoryManager() noexcept {
 // FileMemoryManager
 
 FileMemoryManager::FileMemoryManager(std::string root)
-    : root(root), memory_json() {}
+    : root(root), manifest_json() {}
 
 // TODO do not support sst level yet
 FileMemoryManager::FileMemoryManager(nlohmann::json mem_json, std::string root)
-    : root(root), memory_json(mem_json) {
+    : root(root), manifest_json(mem_json) {
   // restore mapping from json
   for (int i = MemoryPurpose::BEGIN; i < MemoryPurpose::END; ++i) {
     std::string purpose_name = to_string(MemoryPurpose(i));
-    std::string fname = memory_json.at(purpose_name); // maybe error
+    std::string fname = manifest_json.at(purpose_name); // maybe error
     memory[MemoryType(MemoryPurpose(i))] = ::new FileByteArray(fname);
   }
+  update_manifest();
 }
 
 std::string FileMemoryManager::generate_new_filename(MemoryPurpose mp) {
@@ -188,7 +189,8 @@ ByteArrayPtr FileMemoryManager::create_file(MemoryPurpose memory_purpose) {
   assert(memory.count(memory_type) == 0);
   std::string fname = generate_new_filename(memory_purpose);
   memory[memory_type] = ::new FileByteArray(fname);
-  memory_json[to_string(memory_purpose)] = fname;
+  manifest_json[to_string(memory_purpose)] = fname;
+  update_manifest();
   return memory[memory_type];
 }
 
@@ -204,13 +206,15 @@ void FileMemoryManager::end_overwrite(MemoryPurpose memory_purpose) {
   MemoryType memory_type(memory_purpose);
   delete memory[memory_type];
   memory[memory_type] = memory_to_overwrite[memory_type];
-  memory_json[to_string(memory_purpose)] = memory[memory_type]->file_name();
+  manifest_json[to_string(memory_purpose)] = memory[memory_type]->file_name();
+  update_manifest();
   memory_to_overwrite.erase(memory_type);
 }
 
 void FileMemoryManager::remove(MemoryPurpose memory_purpose) {
   MemoryType memory_type(memory_purpose);
-  memory_json.erase(to_string(memory_purpose));
+  manifest_json.erase(to_string(memory_purpose));
+  update_manifest();
   delete memory[memory_type];
   memory.erase(memory_type);
 }
