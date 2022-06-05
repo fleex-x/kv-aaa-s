@@ -99,6 +99,33 @@ TEST_CASE("SLUpperLevelRecordViewer tests") {
     }
 }
 
+namespace {
+
+ByteType gen_byte() {
+    static std::random_device rnd_device;
+    static std::mt19937 mersenne_engine{rnd_device()}; // Generates random integers
+    static std::uniform_int_distribution<unsigned> dist{
+            1, static_cast<unsigned>(std::numeric_limits<std::byte>::max())};
+    return std::byte(dist(mersenne_engine));
+}
+
+KeyType gen_key() {
+    KeyType key;
+    for (auto &i : key) {
+        i = gen_byte();
+    }
+    return key;
+}
+
+std::uint64_t gen_offset() {
+    static std::random_device rnd_device;
+    static std::mt19937_64 mersenne_engine{rnd_device()}; // Generates random integers
+    static std::uniform_int_distribution<std::uint64_t> dist{0, std::numeric_limits<std::uint64_t>::max()};
+    return dist(mersenne_engine);
+}
+
+}
+
 TEST_CASE("SkipList tests simple") {
     RAMByteArray bottom;
     RAMByteArray heads;
@@ -158,18 +185,6 @@ TEST_CASE("SkipList stress-tests") {
     std::uniform_int_distribution<unsigned> dist{
             1, static_cast<unsigned>(std::numeric_limits<std::byte>::max())};
 
-    auto gen_byte = [&dist, &mersenne_engine]() {
-        return std::byte(dist(mersenne_engine));
-    };
-    auto gen_key = [&] {
-        KeyType key;
-        for (auto &i : key) {
-            i = gen_byte();
-        }
-        return key;
-    };
-    auto gen_offset = [&] { return (std::uint64_t)dist(mersenne_engine); };
-
     std::vector<std::pair<KeyType, std::uint64_t>> records;
     auto has_key = [&records](const KeyType &key) {
         return std::any_of(records.begin(), records.end(), [&key](const std::pair<KeyType, std::uint64_t> &elem) {
@@ -192,5 +207,76 @@ TEST_CASE("SkipList stress-tests") {
             CHECK(val.value() == offset);
         }
     }
+}
 
+void put(std::map<KeyType, std::uint64_t> &map, SkipList &skip_list,
+         const KeyType &key, std::uint64_t offset) {
+        map.emplace(key, offset);
+        skip_list.put(key, offset);
+}
+
+void find(std::map<KeyType, std::uint64_t> &map, SkipList &skip_list,
+         const KeyType &key) {
+    auto val = skip_list.find(key);
+    bool contains_in_map = map.count(key) == 1;
+    CHECK(contains_in_map == val.has_value());
+    if (contains_in_map) {
+        CHECK(val.value() == map[key]);
+    }
+}
+
+TEST_CASE("SkipList with map stress-tests") {
+    static std::random_device rnd_device;
+    static std::mt19937_64 mersenne_engine{rnd_device()}; // Generates random integers
+    static std::uniform_int_distribution<std::uint64_t> dist{0, 2};
+
+    RAMByteArray bottom;
+    RAMByteArray heads;
+    RAMByteArray upper;
+    SLBottomLevelRecordViewer bottom_viewer(&bottom);
+    SLUpperLevelRecordViewer upper_viewer(&upper, &heads);
+    SkipList skip_list(bottom_viewer, upper_viewer);
+
+    std::map<KeyType, std::uint64_t> map;
+
+    std::vector<KeyType> used_keys;
+    static constexpr std::size_t UWU1 = 500;
+
+    auto put_new_key = [&]() {
+        KeyType key = gen_key();
+        std::uint64_t offset = gen_offset();
+        put(map, skip_list, key, offset);
+        used_keys.emplace_back(key);
+    };
+
+    auto put_old_key = [&]() {
+        KeyType key = used_keys[mersenne_engine() % used_keys.size()];
+        std::uint64_t offset = gen_offset();
+        put(map, skip_list, key, offset);
+    };
+
+    auto call_find = [&] {
+        KeyType key = gen_key();
+        find(map, skip_list, key);
+    };
+
+    for (std::size_t i = 0; i < UWU1; ++i) {
+        put_new_key();
+    }
+
+    static constexpr std::size_t UWU2 = 10000;
+
+    for (std::size_t i = 0; i < UWU2; ++i) {
+        switch (dist(mersenne_engine)) {
+            case 0:
+                put_new_key();
+                break;
+            case 1:
+                put_old_key();
+                break;
+            case 2:
+                call_find();
+                break;
+        }
+    }
 }

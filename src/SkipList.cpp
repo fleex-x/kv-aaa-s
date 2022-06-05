@@ -77,6 +77,27 @@ void SkipList::insert_after_parents(const std::vector<std::uint64_t> &parents,
     }
 }
 
+void SkipList::insert_instead_parents(const std::vector<std::uint64_t> &parents,
+                                      const KeyType &key,
+                                      std::uint64_t offset) {
+    for (std::size_t level = 0; level < parents.size(); ++level) {
+        if (parents[level] == NULL_NODE) {
+            break;
+        }
+        if (level == 0) {
+            if (bottom[parents[level]].key != key) {
+                break;
+            }
+            bottom.set_offset(parents[level], offset);
+        } else {
+            if (upper[parents[level]].key != key) {
+                break;
+            }
+            upper.set_offset(parents[level], offset);
+        }
+    }
+}
+
 void SkipList::put(const KeyType &key, std::uint64_t offset) {
     if (!bottom.has_head()) {
         SLBottomLevelRecord new_record(key, offset);
@@ -124,7 +145,12 @@ void SkipList::put(const KeyType &key, std::uint64_t offset) {
             break;
         }
     }
-    if (bottom_node != NULL_NODE && bottom[bottom_node].key <= key) {
+    if (bottom_node != NULL_NODE && bottom[bottom_node].key == key) {
+        parents[0] = bottom_node;
+        insert_instead_parents(parents, key, offset);
+        return;
+    }
+    if (bottom_node != NULL_NODE && bottom[bottom_node].key < key) {
         parents[0] = bottom_node;
     }
     insert_after_parents(parents, key, offset);

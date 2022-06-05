@@ -68,6 +68,11 @@ void SLBottomLevelRecordViewer::set_next(std::uint64_t ind, std::uint64_t new_ne
     byte_arr->rewrite(get_begin(ind) + SLBottomLevelRecord::NEXT_BEGIN, next_chars);
 }
 
+void SLBottomLevelRecordViewer::set_offset(std::uint64_t ind, std::uint64_t new_offset) {
+    std::vector<ByteType> next_chars(sizeof(new_offset));
+    std::memcpy(next_chars.data(), &new_offset, sizeof(new_offset));
+    byte_arr->rewrite(get_begin(ind) + SLBottomLevelRecord::OFFSET_BEGIN, next_chars);
+}
 
 SLBottomLevelRecord SLBottomLevelRecordViewer::operator[](std::uint64_t ind) {
     return get_record(ind);
@@ -151,6 +156,12 @@ void SLUpperLevelRecordViewer::set_next(std::uint64_t ind, std::uint64_t new_nex
     std::vector<ByteType> next_chars(sizeof(new_next));
     std::memcpy(next_chars.data(), &new_next, sizeof(new_next));
     byte_arr->rewrite(get_begin(ind) + SLUpperLevelRecord::NEXT_BEGIN, next_chars);
+}
+
+void SLUpperLevelRecordViewer::set_offset(std::uint64_t ind, std::uint64_t new_offset) {
+    std::vector<ByteType> next_chars(sizeof(new_offset));
+    std::memcpy(next_chars.data(), &new_offset, sizeof(new_offset));
+    byte_arr->rewrite(get_begin(ind) + SLUpperLevelRecord::OFFSET_BEGIN, next_chars);
 }
 
 SLUpperLevelRecord SLUpperLevelRecordViewer::operator[](std::uint64_t ind) {
