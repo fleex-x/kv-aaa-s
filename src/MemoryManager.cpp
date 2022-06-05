@@ -240,3 +240,4 @@ static FileMemoryManager from_file(std::string root) {
 }
 
 } // namespace kvaaas
+

@@ -184,5 +184,4 @@ private:
   std::string root;
   nlohmann::json manifest_json; // assume it cannot down during overwriting
 };
-
 } // namespace kvaaas

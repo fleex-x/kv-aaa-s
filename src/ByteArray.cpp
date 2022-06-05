@@ -53,6 +53,11 @@ std::vector<ByteType> FileByteArray::read(std::size_t l, std::size_t r) {
 
 std::size_t FileByteArray::size() { return data.tellp(); }
 
-FileByteArray::~FileByteArray() { data.close(); }
+FileByteArray::~FileByteArray() {
+  data.close();
+  if (BA_TESTMODE) {
+    std::remove(underlying_file.c_str());
+  }
+}
 
 } // namespace kvaaas

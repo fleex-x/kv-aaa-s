@@ -20,7 +20,6 @@ public:
   virtual ~ByteArray() = default;
 };
 
-
 class RAMByteArray : public ByteArray {
 private:
   std::vector<ByteType> byte_array;
@@ -36,9 +35,6 @@ public:
 };
 
 class FileByteArray final : public ByteArray {
-private:
-  std::fstream data;
-
 public:
   explicit FileByteArray(const std::string &s);
 
@@ -52,14 +48,14 @@ public:
 
   ~FileByteArray() override;
 
-  std::string file_name() const noexcept {
-    return underlying_file;
-  }
+  std::string file_name() const noexcept { return underlying_file; }
+
 private:
+  std::fstream data;
   std::string underlying_file;
 };
 
 using ByteArrayPtr = ByteArray *;
-using FileByteArrayPtr = FileByteArray*;
+using FileByteArrayPtr = FileByteArray *;
 
 } // namespace kvaaas

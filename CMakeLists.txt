@@ -24,9 +24,14 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic") # TODO add -Werror
 include_directories(libs/include)
 include_directories(include)
 
-add_executable(main main.cpp)
+#add_executable(main main.cpp)
 
 add_executable(test ${tests} ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
+
+add_executable(sanitizer-test ${tests} ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
+target_compile_options(sanitizer-test PUBLIC -fsanitize=address -fsanitize=undefined)
+target_link_options(sanitizer-test PUBLIC -fsanitize=address -fsanitize=undefined)
+
 add_executable(KVSRecordsTest tests/doctest_main.cpp tests/KVSRecords_test.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 add_executable(SkipListTest tests/doctest_main.cpp tests/skip_list_tests.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 add_executable(FileByteArrayTest tests/doctest_main.cpp tests/FileByteArray_tests.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})

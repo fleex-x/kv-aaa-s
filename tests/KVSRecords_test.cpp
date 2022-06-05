@@ -1,7 +1,3 @@
-//
-// Created by vladimir on 04.06.22.
-//
-
 #include "doctest.h"
 #include <KVSRecordsViewer.h>
 #include <iostream>
@@ -10,7 +6,7 @@
 using namespace kvaaas;
 
 namespace {
-KVSRecord genRandom() {
+KVSRecord gen_random() {
   KVSRecord record{};
 
   std::random_device rd;
@@ -39,9 +35,9 @@ TEST_CASE("Single append") {
   FileByteArray arr("fileArray");
   KVSRecordsViewer viewer(&arr, nullptr);
 
-  KVSRecord record = genRandom();
+  KVSRecord record = gen_random();
   viewer.append(record);
-  KVSRecord read_record = viewer.readRecord(0);
+  KVSRecord read_record = viewer.read_record(0);
 
   CHECK(record.key == read_record.key);
   CHECK(record.is_deleted == read_record.is_deleted);
@@ -58,33 +54,33 @@ TEST_CASE("Multiple append") {
 
   std::vector<KVSRecord> records(1000);
   for (auto &record : records) {
-    record = genRandom();
+    record = gen_random();
     viewer.append(record);
   }
 
   std::uint64_t offset = 0;
   for (const auto &record : records) {
-    CHECK(record == viewer.readRecord(offset));
-    offset += KVSRecordsViewer::getValueSize(record);
+    CHECK(record == viewer.read_record(offset));
+    offset += KVSRecordsViewer::get_value_size(record);
   }
 }
 
-TEST_CASE("Multiple isDeleted") {
+TEST_CASE("Multiple is_deleted") {
   FileByteArray arr("fileArray");
   KVSRecordsViewer viewer(&arr, nullptr);
 
   std::vector<KVSRecord> records(1000);
   for (auto &record : records) {
-    record = genRandom();
+    record = gen_random();
     viewer.append(record);
   }
 
   std::uint64_t offset = 0;
   for (const auto &record : records) {
     if (record.is_deleted == std::byte{1}) {
-      CHECK(viewer.isDeleted(offset));
+      CHECK(viewer.is_deleted(offset));
     }
-    offset += KVSRecordsViewer::getValueSize(record);
+    offset += KVSRecordsViewer::get_value_size(record);
   }
 }
 
@@ -97,7 +93,7 @@ TEST_CASE("Multiple markDeleted") {
   std::vector<uint64_t> marked_offsets;
 
   for (auto &record : records) {
-    record = genRandom();
+    record = gen_random();
     record.is_deleted = ByteType{0};
     viewer.append(record);
   }
@@ -109,30 +105,30 @@ TEST_CASE("Multiple markDeleted") {
   std::uint64_t offset = 0;
   for (uint64_t i = 0; i < records.size(); i++) {
     if (dist(rnd)) {
-      viewer.markAsDeleted(offset);
+      viewer.mark_as_deleted(offset);
       marked_offsets.push_back(offset);
       marked_records[i] = 1;
     }
-    offset += KVSRecordsViewer::getValueSize(records[i]);
+    offset += KVSRecordsViewer::get_value_size(records[i]);
   }
 
   for (const auto &marked_offset : marked_offsets) {
-    CHECK(viewer.isDeleted(marked_offset));
+    CHECK(viewer.is_deleted(marked_offset));
   }
 
   SUBCASE("Checking whether anything other is changed") {
     offset = 0;
     for (uint64_t i = 0; i < records.size(); i++) {
-      KVSRecord read_record = viewer.readRecord(offset);
+      KVSRecord read_record = viewer.read_record(offset);
       if (marked_records[i]) {
-        CHECK(viewer.isDeleted(offset));
+        CHECK(viewer.is_deleted(offset));
       } else {
-        CHECK(!viewer.isDeleted(offset));
+        CHECK(!viewer.is_deleted(offset));
       }
       CHECK(records[i].key == read_record.key);
       CHECK(records[i].value_size == read_record.value_size);
       CHECK(records[i].value == read_record.value);
-      offset += KVSRecordsViewer::getValueSize(records[i]);
+      offset += KVSRecordsViewer::get_value_size(records[i]);
     }
   }
 }
