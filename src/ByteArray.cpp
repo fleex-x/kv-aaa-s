@@ -55,7 +55,9 @@ std::size_t FileByteArray::size() { return data.tellp(); }
 
 FileByteArray::~FileByteArray() {
   data.close();
-  std::remove(file_name.c_str());
+  if (BA_TESTMODE) {
+    std::remove(file_name.c_str());
+  }
 }
 
 } // namespace kvaaas
