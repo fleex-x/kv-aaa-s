@@ -10,7 +10,7 @@
 using namespace kvaaas;
 
 namespace {
-std::vector<ByteType> genRandom(int n) {
+std::vector<ByteType> gen_random(int n) {
 
   std::vector<ByteType> arr(n);
   std::random_device rd;
@@ -29,7 +29,7 @@ TEST_CASE("Create") { FileByteArray arr("fileArray"); }
 
 TEST_CASE("Append") {
   FileByteArray arr("fileArray");
-  auto testArr = genRandom(1000);
+  auto testArr = gen_random(1000);
   arr.append(testArr);
 
   CHECK(arr.read(0, 1000) == testArr);
@@ -40,7 +40,7 @@ TEST_CASE("Multiple append") {
   std::vector<std::vector<ByteType>> bArrs(100);
 
   for (auto &bArr : bArrs) {
-    bArr = genRandom(1000);
+    bArr = gen_random(1000);
     arr.append(bArr);
   }
 
@@ -60,7 +60,7 @@ TEST_CASE("Multiple append, but different offsets") {
   std::uniform_int_distribution<int> dist(10000, 50000);
 
   for (auto &bArr : bArrs) {
-    bArr = genRandom(dist(rnd));
+    bArr = gen_random(dist(rnd));
     arr.append(bArr);
   }
 
@@ -73,7 +73,7 @@ TEST_CASE("Multiple append, but different offsets") {
 
 TEST_CASE("Rewrite") {
   FileByteArray arr("fileArray");
-  auto startArr = genRandom(2000000);
+  auto startArr = gen_random(2000000);
   arr.append(startArr);
 
   CHECK(startArr == arr.read(0, startArr.size()));
@@ -85,7 +85,7 @@ TEST_CASE("Rewrite") {
   int l = dist(rnd);
   int r = l + dist(rnd);
 
-  auto changedArr = genRandom(r - l);
+  auto changedArr = gen_random(r - l);
 
   for (int i = 0, j = l; j < r; j++, i++) {
     startArr[j] = changedArr[i];
@@ -103,7 +103,7 @@ TEST_CASE("Rewrite") {
 
 TEST_CASE("Size") {
   FileByteArray arr("fileArray");
-  auto testArr = genRandom(10000);
+  auto testArr = gen_random(10000);
   arr.append(testArr);
   CHECK(arr.size() == 10000);
 

@@ -1,7 +1,3 @@
-//
-// Created by vladimir on 04.06.22.
-//
-
 #include <KVSRecordsViewer.h>
 
 namespace kvaaas {
@@ -10,7 +6,7 @@ KVSRecordsViewer::KVSRecordsViewer(ByteArray *arr, void *compressor)
     : byte_arr(arr), comp(compressor) {}
 
 void KVSRecordsViewer::append(KVSRecord record) {
-  std::uint64_t SIZE = getValueSize(record);
+  std::uint64_t SIZE = get_value_size(record);
   std::vector<ByteType> record_chars(SIZE); /// TODO make pretty
   std::memcpy(record_chars.data(), &record.key, KEY_SIZE_BYTES);
   std::memcpy(record_chars.data() + KEY_SIZE_BYTES, &record.is_deleted,
@@ -24,7 +20,7 @@ void KVSRecordsViewer::append(KVSRecord record) {
   byte_arr->append(record_chars);
 }
 
-KVSRecord KVSRecordsViewer::readRecord(uint64_t offset) {
+KVSRecord KVSRecordsViewer::read_record(uint64_t offset) {
   KVSRecord record{};
   std::vector<ByteType> key_array =
       byte_arr->read(offset, offset + KEY_SIZE_BYTES);
@@ -48,17 +44,17 @@ KVSRecord KVSRecordsViewer::readRecord(uint64_t offset) {
   return record;
 }
 
-void KVSRecordsViewer::markAsDeleted(uint64_t offset) {
+void KVSRecordsViewer::mark_as_deleted(uint64_t offset) {
   byte_arr->rewrite(offset + KEY_SIZE_BYTES,
                     std::vector<ByteType>(1, ByteType{1}));
 }
 
-bool KVSRecordsViewer::isDeleted(uint64_t offset) {
+bool KVSRecordsViewer::is_deleted(uint64_t offset) {
   return byte_arr->read(offset + KEY_SIZE_BYTES,
                         offset + KEY_SIZE_BYTES + 1)[0] == ByteType{1};
 }
 
-std::uint64_t KVSRecordsViewer::getValueSize(const KVSRecord &record) {
+std::uint64_t KVSRecordsViewer::get_value_size(const KVSRecord &record) {
   return KEY_SIZE_BYTES + sizeof(record.is_deleted) +
          sizeof(record.value_size) + record.value_size;
 }
