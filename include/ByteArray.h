@@ -3,6 +3,8 @@
 #include <vector>
 #include <fstream>
 
+#define BA_TESTMODE true
+
 namespace kvaaas {
 
 class ByteArray {
@@ -34,13 +36,13 @@ public:
   std::size_t size() override;
 };
 
-class FileByteArray : public ByteArray {
+class FileByteArray final : public ByteArray {
 private:
   std::fstream data;
 
 public:
 
-  FileByteArray(const std::string &s);
+  explicit FileByteArray(const std::string &s);
 
   void append(const std::vector<ByteType> &bytes) override;
 
@@ -50,6 +52,6 @@ public:
 
   std::size_t size() override;
 
-  ~FileByteArray();
+  ~FileByteArray() override;
 };
 } // namespace kvaaas
