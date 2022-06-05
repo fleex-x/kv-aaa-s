@@ -11,7 +11,7 @@
 using namespace kvaaas;
 
 TEST_CASE("SLBottomLevelRecordViewer tests") {
-    RAMByteArray arr;
+    FileByteArray arr("SkipListFile");
     SLBottomLevelRecordViewer viewer(&arr);
     CHECK(viewer.get_head() == NULL_NODE);
     viewer.set_head(100);
@@ -47,8 +47,8 @@ TEST_CASE("SLBottomLevelRecordViewer tests") {
 }
 
 TEST_CASE("SLUpperLevelRecordViewer tests") {
-    RAMByteArray arr;
-    RAMByteArray heads_arr;
+    FileByteArray arr("skipListFile");
+    FileByteArray heads_arr("HeadsFile");
     SLUpperLevelRecordViewer viewer(&arr, &heads_arr);
     static constexpr std::size_t SIZE = 100;
     std::vector<uint64_t> heads(SIZE);

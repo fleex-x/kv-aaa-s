@@ -31,3 +31,8 @@ add_executable(test ${tests} ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 add_executable(sanitizer-test ${tests} ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 target_compile_options(sanitizer-test PUBLIC -fsanitize=address -fsanitize=undefined)
 target_link_options(sanitizer-test PUBLIC -fsanitize=address -fsanitize=undefined)
+
+add_executable(KVSRecordsTest tests/doctest_main.cpp tests/KVSRecords_test.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
+add_executable(SkipListTest tests/doctest_main.cpp tests/skip_list_tests.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
+add_executable(FileByteArrayTest tests/doctest_main.cpp tests/FileByteArray_tests.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
+add_executable(SSTTest tests/doctest_main.cpp tests/sst.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
