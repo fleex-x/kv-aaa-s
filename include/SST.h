@@ -1,11 +1,13 @@
 #pragma once
 
+#include "BloomFilter.h"
 #include "ByteArray.h"
 #include "Core.h"
+
 #include <algorithm>
-#include <vector>
 #include <cstring>
 #include <iostream> // for debug, remove later
+#include <vector>
 
 namespace kvaaas {
 
@@ -42,8 +44,6 @@ struct SSTRecordViewer {
     return rec;
   }
 
-  // TODO(mkornaukhov03)
-  // support rebuild from byte array
   SSTRecordViewer(ByteArrayPtr data, RebuildSSTRV) : _data(data) {}
 
   std::uint64_t size() const noexcept {
@@ -58,7 +58,12 @@ private:
 
 struct SST {
 
-  explicit SST(SSTRecordViewer rec_viewer) : _rec_view(std::move(rec_viewer)) {}
+  explicit SST(SSTRecordViewer rec_viewer)
+      : _rec_view(std::move(rec_viewer)), bf(_rec_view.size()) {
+    for (std::size_t i = 0; i < _rec_view.size(); ++i) {
+      bf.add(rec_viewer.get_record(i).key);
+    }
+  }
 
   struct iterator {
     using value_type = SSTRecord;
@@ -83,9 +88,7 @@ struct SST {
       return _view.same_layout(oth._view) && _index == oth._index;
     }
 
-    bool operator!=(const iterator &oth) {
-      return !(*this == oth);
-    }
+    bool operator!=(const iterator &oth) { return !(*this == oth); }
 
   private:
     SSTRecordViewer _view;
@@ -97,6 +100,25 @@ struct SST {
   iterator end() { return iterator(_rec_view, _rec_view.size()); }
 
   std::uint64_t size() const noexcept { return _rec_view.size(); }
+
+  bool contains(const KeyType &key) {
+    if (!bf.has_key(key))
+      return false;
+    std::int64_t left = 0;                 // less or equal
+    std::int64_t right = _rec_view.size(); // not valid
+
+    while (left + 1 < right) {
+      auto mid = left + (right - left) / 2;
+      auto rec = _rec_view.get_record(mid);
+      if (rec.key == key) {
+        left = mid;
+      } else {
+        right = mid;
+      }
+    }
+    auto rec = _rec_view.get_record(left);
+    return rec.key == key;
+  }
 
   size_t find_offset(const KeyType &key) {
     // find record
@@ -152,6 +174,7 @@ struct SST {
 
 private:
   SSTRecordViewer _rec_view;
+  BloomFilter bf;
 };
 
 } // namespace kvaaas
