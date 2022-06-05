@@ -252,7 +252,14 @@ TEST_CASE("Multiple assignment SkipList") {
     skip_list.put(key2, 100);
     CHECK(skip_list.find(key2).value() == 100);
 
+    std::vector to_push({std::make_pair(key1, 1),
+                         std::make_pair(key2, 2),
+                         std::make_pair(key3, 3)});
+    skip_list.push_from(to_push.begin(), to_push.end());
 
+    CHECK(skip_list.find(key1).value() == 1);
+    CHECK(skip_list.find(key2).value() == 2);
+    CHECK(skip_list.find(key3).value() == 3);
 }
 
 void put(std::map<KeyType, std::uint64_t> &map, SkipList &skip_list,

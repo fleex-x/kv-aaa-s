@@ -32,6 +32,13 @@ public:
     void put(const KeyType &key, std::uint64_t offset);
     std::optional<std::uint64_t> find(const KeyType &key);
     bool has_key(const KeyType &key);
+
+    template<typename It>
+    void push_from(It begin, It end) {
+        for (It it = begin; it != end; ++it) {
+            put(it->first, it->second);
+        }
+    }
 };
 
 }
