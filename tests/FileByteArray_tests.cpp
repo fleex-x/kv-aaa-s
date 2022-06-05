@@ -25,9 +25,7 @@ std::vector<ByteType> genRandom(int n) {
 }
 } // namespace
 
-TEST_CASE("Create") {
-  FileByteArray arr("fileArray");
-}
+TEST_CASE("Create") { FileByteArray arr("fileArray"); }
 
 TEST_CASE("Append") {
   FileByteArray arr("fileArray");
@@ -111,5 +109,4 @@ TEST_CASE("Size") {
 
   arr.append(testArr);
   CHECK(arr.size() == 20000);
-
 }

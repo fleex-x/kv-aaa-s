@@ -24,14 +24,14 @@ std::size_t RAMByteArray::size() { return byte_array.size(); }
 FileByteArray::FileByteArray(const std::string &s) {
   if (std::filesystem::exists(s) && !BA_TESTMODE) {
     data.open(s, std::fstream::ate | std::fstream::binary | std::fstream ::in |
-                std::fstream::out);
-  } else {
-    data.open(s, std::fstream::trunc | std::fstream::binary | std::fstream ::in |
                      std::fstream::out);
+  } else {
+    data.open(s, std::fstream::trunc | std::fstream::binary |
+                     std::fstream ::in | std::fstream::out);
   }
 }
 
-    void FileByteArray::append(const std::vector<ByteType> &bytes) {
+void FileByteArray::append(const std::vector<ByteType> &bytes) {
   data.write(
       reinterpret_cast<const char *>(bytes.data()),
       bytes.size()); /// TODO Где-то здесь потенциально много ошибок вылетает

@@ -40,8 +40,7 @@ public:
   bool isDeleted(uint64_t offset);
 };
 
-bool operator==(const KVSRecord &record1,const KVSRecord &record2);
-
+bool operator==(const KVSRecord &record1, const KVSRecord &record2);
 
 } // namespace kvaaas
 #endif // KV_AAA_S_KVSRECORDSVIEWER_H

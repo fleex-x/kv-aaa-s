@@ -1,7 +1,7 @@
 #pragma once
 #include "Core.h"
-#include <vector>
 #include <fstream>
+#include <vector>
 
 #define BA_TESTMODE true
 
@@ -41,7 +41,6 @@ private:
   std::fstream data;
 
 public:
-
   explicit FileByteArray(const std::string &s);
 
   void append(const std::vector<ByteType> &bytes) override;
