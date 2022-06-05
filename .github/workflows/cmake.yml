@@ -31,9 +31,15 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build
 
-    - name: Test
+    - name: Valgrind test
       working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: valgrind --quiet --leak-check=full --error-exitcode=123 ./test
+
+    - name: Sanitizer test
+        working-directory: ${{github.workspace}}/build
+        # Execute tests defined by the CMake configuration.
+        # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+        run: ./sanitizer-test
       

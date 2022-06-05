@@ -22,12 +22,12 @@ private:
                               std::uint64_t offset);
 
     std::random_device rd;
-    std::mt19937 rng{0};
+    std::mt19937 rng{rd()};
     std::uniform_int_distribution<std::mt19937::result_type> dist{0, 1};
 
 public:
     SkipList(const SLBottomLevelRecordViewer &bottom_, const SLUpperLevelRecordViewer &upper_);
-    void add(const KeyType &key, std::uint64_t offset);
+    void put(const KeyType &key, std::uint64_t offset);
     std::optional<std::uint64_t> find(const KeyType &key);
     bool has_key(const KeyType &key);
 };

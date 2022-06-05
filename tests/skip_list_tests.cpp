@@ -111,14 +111,14 @@ TEST_CASE("SkipList tests simple") {
     auto three = std::byte(3);
     auto four = std::byte(4);
     KeyType key1{one, two, three, four};
-    skip_list.add(key1, 123);
+    skip_list.put(key1, 123);
 
     auto val = skip_list.find(key1);
 
     CHECK(val.has_value());
     CHECK(val.value() == 123);
     KeyType key2{one, one, one, one};
-    skip_list.add(key2, 345);
+    skip_list.put(key2, 345);
 
     val = skip_list.find(key1);
     CHECK(val.has_value());
@@ -129,7 +129,7 @@ TEST_CASE("SkipList tests simple") {
     CHECK(val.value() == 345);
 
     KeyType key3{one, one, three, four};
-    skip_list.add(key3, 567);
+    skip_list.put(key3, 567);
 
     val = skip_list.find(key1);
     CHECK(val.has_value());
@@ -163,8 +163,8 @@ TEST_CASE("SkipList stress-tests") {
     };
     auto gen_key = [&] {
         KeyType key;
-        for (std::size_t i = 0; i < key.size(); ++i) {
-            key[i] = gen_byte();
+        for (auto &i : key) {
+            i = gen_byte();
         }
         return key;
     };
@@ -172,12 +172,9 @@ TEST_CASE("SkipList stress-tests") {
 
     std::vector<std::pair<KeyType, std::uint64_t>> records;
     auto has_key = [&records](const KeyType &key) {
-        for (const auto &[key_, _] : records) {;
-            if (key == key_) {
-                return true;
-            }
-        }
-        return false;
+        return std::any_of(records.begin(), records.end(), [&key](const std::pair<KeyType, std::uint64_t> &elem) {
+            return elem.first == key;
+        });
     };
     static constexpr std::size_t UWU = 500;
     for (std::size_t i = 0; i < UWU; ++i) {
@@ -188,7 +185,7 @@ TEST_CASE("SkipList stress-tests") {
                 break;
             }
         }
-        skip_list.add(records.back().first, records.back().second);
+        skip_list.put(records.back().first, records.back().second);
         for (const auto &[key, offset] : records) {
             auto val = skip_list.find(key);
             CHECK(val.has_value());

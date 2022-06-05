@@ -77,7 +77,7 @@ void SkipList::insert_after_parents(const std::vector<std::uint64_t> &parents,
     }
 }
 
-void SkipList::add(const KeyType &key, std::uint64_t offset) {
+void SkipList::put(const KeyType &key, std::uint64_t offset) {
     if (!bottom.has_head()) {
         SLBottomLevelRecord new_record(key, offset);
         insert_as_head_bottom_level(new_record);
@@ -178,35 +178,5 @@ std::optional<std::uint64_t> SkipList::find(const KeyType &key) {
 bool SkipList::has_key(const KeyType &key) {
     return find(key).has_value();
 }
-
-/**void SkipList::add(KeyType key, std::uint64_t offset) {
-    SLBottomLevelRecord node;
-    std::vector<std::uint64_t> parents;
-    if (levels_count >= 2) {
-        std::uint64_t last_node_ind = upper.get_head(levels_count - 2);
-        SLUpperLevelRecord cur_node = upper.get_record(last_node_ind);
-        for (std::uint64_t current_level = levels_count - 2; current_level != std::uint64_t(-1); --current_level) {
-            while (cur_node.key < key) {
-                last_node_ind = cur_node.next;
-                cur_node = upper.get_record(cur_node.next);
-            }
-            if (current_level != 0) {
-                parents.push_back(last_node_ind);
-                last_node_ind = cur_node.down;
-                cur_node = upper.get_record(cur_node.down);
-            }
-        }
-        node = bottom.get_record(cur_node.down);
-    } else {
-        node = bottom.get_record(bottom.get_head());
-    }
-    while (node.key < key) {
-        node = bottom.get_record(node.next);
-    }
-    if (node.key == key) {
-        return;
-    }
-
-}**/
 
 }
