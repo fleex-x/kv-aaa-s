@@ -6,6 +6,7 @@
 #include <climits>
 #include <random>
 #include <algorithm>
+#include <iostream>
 
 using namespace kvaaas;
 
@@ -66,7 +67,6 @@ TEST_CASE("SLUpperLevelRecordViewer tests") {
     SLUpperLevelRecord record;
     record.next = 100;
     record.down = 100;
-    record.offset = 100;
     for (ByteType &byte : record.key) {
         byte = static_cast<ByteType>('a');
     }
@@ -77,7 +77,6 @@ TEST_CASE("SLUpperLevelRecordViewer tests") {
     for (std::size_t i = 0; i < SIZE; ++i) {
         records[i].next = rnd();
         records[i].down = rnd();
-        records[i].offset = rnd();
         for (ByteType &j : records[i].key) {
             j = static_cast<ByteType>(rnd() % (UCHAR_MAX + 1));
         }
@@ -141,12 +140,11 @@ TEST_CASE("SkipList tests simple") {
     skip_list.put(key1, 123);
 
     auto val = skip_list.find(key1);
-
     CHECK(val.has_value());
     CHECK(val.value() == 123);
+
     KeyType key2{one, one, one, one};
     skip_list.put(key2, 345);
-
     val = skip_list.find(key1);
     CHECK(val.has_value());
     CHECK(val.value() == 123);
@@ -191,7 +189,7 @@ TEST_CASE("SkipList stress-tests") {
             return elem.first == key;
         });
     };
-    static constexpr std::size_t UWU = 500;
+    static constexpr std::size_t UWU = 100;
     for (std::size_t i = 0; i < UWU; ++i) {
         while (true) {
             auto key = gen_key();
@@ -209,17 +207,69 @@ TEST_CASE("SkipList stress-tests") {
     }
 }
 
+TEST_CASE("Multiple assignment SkipList") {
+    RAMByteArray bottom;
+    RAMByteArray heads;
+    RAMByteArray upper;
+    SLBottomLevelRecordViewer bottom_viewer(&bottom);
+    SLUpperLevelRecordViewer upper_viewer(&upper, &heads);
+    SkipList skip_list(bottom_viewer, upper_viewer);
+
+    KeyType key1{std::byte(1)};
+    KeyType key2{std::byte(2)};
+    KeyType key3{std::byte(3)};
+    KeyType key4{std::byte(4)};
+    KeyType key5{std::byte(5)};
+    KeyType key6{std::byte(6)};
+
+    skip_list.put(key1, 123);
+    CHECK(skip_list.find(key1).value() == 123);
+
+    skip_list.put(key1, 345);
+    CHECK(skip_list.find(key1).value() == 345);
+
+    skip_list.put(key2, 567);
+    CHECK(skip_list.find(key2).value() == 567);
+
+    skip_list.put(key2, 345);
+    CHECK(skip_list.find(key2).value() == 345);
+
+    skip_list.put(key5, 123);
+    CHECK(skip_list.find(key5).value() == 123);
+
+    skip_list.put(key4, 123);
+    CHECK(skip_list.find(key4).value() == 123);
+
+    skip_list.put(key6, 123);
+    CHECK(skip_list.find(key6).value() == 123);
+
+    skip_list.put(key3, 789);
+    CHECK(skip_list.find(key3).value() == 789);
+
+    skip_list.put(key3, 123);
+    CHECK(skip_list.find(key3).value() == 123);
+
+    skip_list.put(key2, 100);
+    CHECK(skip_list.find(key2).value() == 100);
+
+
+}
+
 void put(std::map<KeyType, std::uint64_t> &map, SkipList &skip_list,
          const KeyType &key, std::uint64_t offset) {
-        map.emplace(key, offset);
-        skip_list.put(key, offset);
+    map[key] = offset;
+    skip_list.put(key, offset);
 }
 
 void find(std::map<KeyType, std::uint64_t> &map, SkipList &skip_list,
          const KeyType &key) {
     auto val = skip_list.find(key);
     bool contains_in_map = map.count(key) == 1;
-    CHECK(contains_in_map == val.has_value());
+    if (contains_in_map) {
+        CHECK(val.has_value());
+    } else {
+        CHECK(!val.has_value());
+    }
     if (contains_in_map) {
         CHECK(val.value() == map[key]);
     }
@@ -228,7 +278,7 @@ void find(std::map<KeyType, std::uint64_t> &map, SkipList &skip_list,
 TEST_CASE("SkipList with map stress-tests") {
     static std::random_device rnd_device;
     static std::mt19937_64 mersenne_engine{rnd_device()}; // Generates random integers
-    static std::uniform_int_distribution<std::uint64_t> dist{0, 2};
+    static std::uniform_int_distribution<std::uint64_t> dist{0, 3};
 
     RAMByteArray bottom;
     RAMByteArray heads;
@@ -240,7 +290,7 @@ TEST_CASE("SkipList with map stress-tests") {
     std::map<KeyType, std::uint64_t> map;
 
     std::vector<KeyType> used_keys;
-    static constexpr std::size_t UWU1 = 500;
+    static constexpr std::size_t UWU1 = 200;
 
     auto put_new_key = [&]() {
         KeyType key = gen_key();
@@ -255,7 +305,12 @@ TEST_CASE("SkipList with map stress-tests") {
         put(map, skip_list, key, offset);
     };
 
-    auto call_find = [&] {
+    auto call_find_old_key = [&] {
+        KeyType key = used_keys[mersenne_engine() % used_keys.size()];
+        find(map, skip_list, key);
+    };
+
+    auto call_find_new_key = [&] {
         KeyType key = gen_key();
         find(map, skip_list, key);
     };
@@ -275,7 +330,10 @@ TEST_CASE("SkipList with map stress-tests") {
                 put_old_key();
                 break;
             case 2:
-                call_find();
+                call_find_old_key();
+                break;
+            case 3:
+                call_find_new_key();
                 break;
         }
     }

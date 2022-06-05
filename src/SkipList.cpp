@@ -38,33 +38,27 @@ std::uint64_t SkipList::insert_as_head_bottom_level(SLBottomLevelRecord &new_nod
     return pos;
 }
 
+std::uint64_t SkipList::insert(std::uint64_t level, std::uint64_t after_pos, std::uint64_t down, std::uint64_t offset, const KeyType &key) {
+    if (level == 0) {
+        SLBottomLevelRecord new_record(key, offset);
+        return after_pos == NULL_NODE
+               ? insert_as_head_bottom_level(new_record)
+               : insert_after_on_bottom_level(after_pos, new_record);
+    } else {
+        SLUpperLevelRecord new_record(key, down);
+        return after_pos == NULL_NODE
+               ? insert_as_head_upper_level(level - 1, new_record)
+               : insert_after_on_upper_level(after_pos, new_record);
+    }
+}
+
 void SkipList::insert_after_parents(const std::vector<std::uint64_t> &parents,
                                     const KeyType &key,
                                     std::uint64_t offset) {
     std::uint64_t down = NULL_NODE;
-    auto insert =
-            [this, &key, &offset, &down]
-            (std::uint64_t level, std::uint64_t after_that) {
-        if (level == 0 && after_that == NULL_NODE) {
-            SLBottomLevelRecord new_record(key, offset);
-            return insert_as_head_bottom_level(new_record);
-        }
-        if (level == 0 && after_that != NULL_NODE) {
-            SLBottomLevelRecord new_record(key, offset);
-            return insert_after_on_bottom_level(after_that, new_record);
-        }
-        if (level != 0 && after_that == NULL_NODE) {
-            SLUpperLevelRecord new_record(key, down, offset);
-            return insert_as_head_upper_level(level - 1, new_record);
-        }
-        if (level != 0 && after_that != NULL_NODE) {
-            SLUpperLevelRecord new_record(key, down, offset);
-            return insert_after_on_upper_level(after_that, new_record);
-        }
-    };
     std::uint64_t cur_level = 0;
     while (cur_level < parents.size()) {
-        down = insert(cur_level, parents[cur_level]);
+        down = insert(cur_level, parents[cur_level], down, offset, key);
         ++cur_level;
         if (dist(rng) == 0) {
             break;
@@ -72,29 +66,8 @@ void SkipList::insert_after_parents(const std::vector<std::uint64_t> &parents,
     }
     if (cur_level == levels_count && dist(rng) == 1) {
         upper.append_head(NULL_NODE);
-        insert(cur_level, NULL_NODE);
+        insert(cur_level, NULL_NODE, down, offset, key);
         ++levels_count;
-    }
-}
-
-void SkipList::insert_instead_parents(const std::vector<std::uint64_t> &parents,
-                                      const KeyType &key,
-                                      std::uint64_t offset) {
-    for (std::size_t level = 0; level < parents.size(); ++level) {
-        if (parents[level] == NULL_NODE) {
-            break;
-        }
-        if (level == 0) {
-            if (bottom[parents[level]].key != key) {
-                break;
-            }
-            bottom.set_offset(parents[level], offset);
-        } else {
-            if (upper[parents[level]].key != key) {
-                break;
-            }
-            upper.set_offset(parents[level], offset);
-        }
     }
 }
 
@@ -146,8 +119,7 @@ void SkipList::put(const KeyType &key, std::uint64_t offset) {
         }
     }
     if (bottom_node != NULL_NODE && bottom[bottom_node].key == key) {
-        parents[0] = bottom_node;
-        insert_instead_parents(parents, key, offset);
+        bottom.set_offset(bottom_node, offset);
         return;
     }
     if (bottom_node != NULL_NODE && bottom[bottom_node].key < key) {
@@ -194,7 +166,8 @@ std::optional<std::uint64_t> SkipList::find(const KeyType &key) {
           bottom[bottom_node].key < key) {
         bottom_node = bottom.get_next(bottom_node);
     }
-    if (bottom[bottom_node].key == key) {
+    if (bottom_node != NULL_NODE &&
+        bottom[bottom_node].key == key) {
         return bottom[bottom_node].offset;
     } else {
         return {};

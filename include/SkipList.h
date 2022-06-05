@@ -21,12 +21,10 @@ private:
                               const KeyType &key,
                               std::uint64_t offset);
 
-    void insert_instead_parents(const std::vector<std::uint64_t> &parents,
-                                const KeyType &key,
-                                std::uint64_t offset);
+    std::uint64_t insert(std::uint64_t level, std::uint64_t after_pos, std::uint64_t down, std::uint64_t offset, const KeyType &key);
 
     std::random_device rd;
-    std::mt19937 rng{rd()};
+    std::mt19937 rng{0};
     std::uniform_int_distribution<std::mt19937::result_type> dist{0, 1};
 
 public:

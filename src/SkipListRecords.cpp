@@ -90,16 +90,16 @@ std::uint64_t SLBottomLevelRecordViewer::append_record(const SLBottomLevelRecord
 
 
 
-SLUpperLevelRecord::SLUpperLevelRecord(const KeyType &key_, std::uint64_t  down_, std::uint64_t offset_) :
+SLUpperLevelRecord::SLUpperLevelRecord(const KeyType &key_, std::uint64_t  down_) :
     down(down_),
-    offset(offset_),
     key(key_) {
 }
 
 
 bool operator==(const SLUpperLevelRecord &record1, const SLUpperLevelRecord &record2) {
-    return record1.next == record2.next && record1.offset == record2.offset &&
-           record1.down == record2.down && record1.key == record2.key;
+    return record1.next == record2.next &&
+           record1.down == record2.down &&
+           record1.key == record2.key;
 }
 
 SLUpperLevelRecordViewer::SLUpperLevelRecordViewer(ByteArrayPtr byte_arr_, ByteArrayPtr heads_) :
@@ -139,7 +139,6 @@ SLUpperLevelRecord SLUpperLevelRecordViewer::get_record(std::uint64_t ind) {
     SLUpperLevelRecord record;
     std::memcpy(&record.next, record_chars.data() + SLUpperLevelRecord::NEXT_BEGIN, sizeof(record.next));
     std::memcpy(&record.down, record_chars.data() + SLUpperLevelRecord::DOWN_BEGIN, sizeof(record.down));
-    std::memcpy(&record.offset, record_chars.data() + SLUpperLevelRecord::OFFSET_BEGIN, sizeof(record.offset));
     std::memcpy(record.key.data(), record_chars.data() + SLUpperLevelRecord::KEY_BEGIN, KEY_SIZE_BYTES);
     return record;
 }
@@ -158,12 +157,6 @@ void SLUpperLevelRecordViewer::set_next(std::uint64_t ind, std::uint64_t new_nex
     byte_arr->rewrite(get_begin(ind) + SLUpperLevelRecord::NEXT_BEGIN, next_chars);
 }
 
-void SLUpperLevelRecordViewer::set_offset(std::uint64_t ind, std::uint64_t new_offset) {
-    std::vector<ByteType> next_chars(sizeof(new_offset));
-    std::memcpy(next_chars.data(), &new_offset, sizeof(new_offset));
-    byte_arr->rewrite(get_begin(ind) + SLUpperLevelRecord::OFFSET_BEGIN, next_chars);
-}
-
 SLUpperLevelRecord SLUpperLevelRecordViewer::operator[](std::uint64_t ind) {
     return get_record(ind);
 }
@@ -172,7 +165,6 @@ std::uint64_t SLUpperLevelRecordViewer::append_record(const SLUpperLevelRecord &
     std::vector<ByteType> record_chars(SLUpperLevelRecord::SIZE);
     std::memcpy(record_chars.data() + SLUpperLevelRecord::NEXT_BEGIN,&record.next,  sizeof(record.next));
     std::memcpy(record_chars.data() + SLUpperLevelRecord::DOWN_BEGIN,&record.down,  sizeof(record.down));
-    std::memcpy(record_chars.data() + SLUpperLevelRecord::OFFSET_BEGIN, &record.offset, sizeof(record.offset));
     std::memcpy(record_chars.data() + SLUpperLevelRecord::KEY_BEGIN, record.key.data(), KEY_SIZE_BYTES);
     byte_arr->append(record_chars);
     return byte_arr->size() / SLUpperLevelRecord::SIZE - 1;
