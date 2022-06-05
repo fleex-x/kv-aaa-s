@@ -1,14 +1,9 @@
-//
-// Created by vladimir on 04.06.22.
-//
+#pragma once
 
 #include "ByteArray.h"
 #include "Error.h"
 #include <cstdint>
 #include <cstring>
-
-#ifndef KV_AAA_S_KVSRECORDSVIEWER_H
-#define KV_AAA_S_KVSRECORDSVIEWER_H
 
 namespace kvaaas {
 
@@ -43,4 +38,3 @@ public:
 bool operator==(const KVSRecord &record1, const KVSRecord &record2);
 
 } // namespace kvaaas
-#endif // KV_AAA_S_KVSRECORDSVIEWER_H
