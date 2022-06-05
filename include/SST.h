@@ -3,9 +3,9 @@
 #include "ByteArray.h"
 #include "Core.h"
 #include <algorithm>
-#include <vector>
 #include <cstring>
 #include <iostream> // for debug, remove later
+#include <vector>
 
 namespace kvaaas {
 
@@ -83,9 +83,7 @@ struct SST {
       return _view.same_layout(oth._view) && _index == oth._index;
     }
 
-    bool operator!=(const iterator &oth) {
-      return !(*this == oth);
-    }
+    bool operator!=(const iterator &oth) { return !(*this == oth); }
 
   private:
     SSTRecordViewer _view;
