@@ -1,5 +1,6 @@
 #pragma once
 #include "Core.h"
+#include "SST.h"
 #include "SkipListRecords.h"
 #include <optional>
 #include <random>
@@ -44,6 +45,47 @@ public:
       put(it->first, it->second);
     }
   }
+
+  class iterator {
+  private:
+    SkipList *owner = nullptr;
+    std::uint64_t cur_node = NULL_NODE;
+
+    iterator(SkipList *owner_, std::uint64_t cur_node_)
+        : owner(owner_), cur_node(cur_node_) {}
+    friend SkipList;
+
+  public:
+    using value_type = SSTRecord;
+
+    const value_type operator*() {
+      auto record = owner->bottom.get_record(cur_node);
+      return {record.key, record.offset};
+    }
+
+    iterator &operator++() {
+      cur_node = owner->bottom.get_next(cur_node);
+      return *this;
+    }
+
+    iterator operator++(int) {
+      iterator iterator = *this;
+      ++(*this);
+      return iterator;
+    }
+
+    bool operator==(const iterator &oth) {
+      return owner == oth.owner && cur_node == oth.cur_node;
+    }
+
+    bool operator!=(const iterator &oth) { return !(*this == oth); }
+  };
+
+  iterator begin() { return {this, bottom.get_head()}; }
+
+  iterator end() { return {this, NULL_NODE}; }
+
+  friend iterator;
 
   std::uint64_t size() const;
 };

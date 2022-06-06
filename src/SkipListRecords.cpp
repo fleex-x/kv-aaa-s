@@ -101,9 +101,8 @@ SLBottomLevelRecordViewer::append_record(const SLBottomLevelRecord &record) {
   return byte_arr->size() / SLBottomLevelRecord::SIZE - 1;
 }
 
-std::uint64_t
-SLBottomLevelRecordViewer::get_elems_count() const {
-    return (byte_arr->size() - HEAD_SIZE) / SLBottomLevelRecord::SIZE;
+std::uint64_t SLBottomLevelRecordViewer::get_elems_count() const {
+  return (byte_arr->size() - HEAD_SIZE) / SLBottomLevelRecord::SIZE;
 }
 
 SLUpperLevelRecord::SLUpperLevelRecord(const KeyType &key_, std::uint64_t down_)

@@ -238,6 +238,17 @@ TEST_CASE("Multiple assignment SkipList") {
   skip_list.put(key5, 123);
   CHECK(skip_list.find(key5).value() == 123);
 
+  auto it = skip_list.begin();
+  CHECK(*it == SSTRecord{key1, 345});
+
+  ++it;
+  CHECK(*it == SSTRecord{key2, 345});
+
+  ++it;
+  CHECK(*it == SSTRecord{key5, 123});
+  ++it;
+  CHECK(it == skip_list.end());
+
   skip_list.put(key4, 123);
   CHECK(skip_list.find(key4).value() == 123);
 
