@@ -3,7 +3,7 @@
 #include <fstream>
 #include <vector>
 
-#define BA_TESTMODE false
+#define BA_TESTMODE false // false because I cannot normally test FileMM 
 
 namespace kvaaas {
 
