@@ -52,7 +52,7 @@ struct Shard {
     SLBottomLevelRecordViewer sl_bottom_viewer(
         manager->get_or_create_byte_array(MemoryPurpose::SKIP_LIST_BL));
     SLUpperLevelRecordViewer sl_upper_viewer(
-        manager->get_or_create_byte_array(MemoryPurpose::SKIP_LIST_UL_H),
+        manager->get_or_create_byte_array(MemoryPurpose::SKIP_LIST_UL),
         manager->get_or_create_byte_array(MemoryPurpose::SKIP_LIST_UL_H));
     skip_list.emplace(sl_bottom_viewer, sl_upper_viewer);
     sst.emplace(SSTRecordViewer(

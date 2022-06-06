@@ -58,7 +58,7 @@ TEST_CASE("In-Log put/get") {
 TEST_CASE("MergeIntoSkipList") {
   Shard shard("shard_test", little_in_ram);
   const std::size_t N = 30;
-  std::array<KeyType, N> keys;
+  std::array<KeyType, N> keys{};
   std::array<ValueType, N> values;
   for (std::size_t i = 0; i < N; ++i) {
     keys[i] = {std::byte(i)};
