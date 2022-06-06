@@ -27,12 +27,12 @@ KVSRecord gen_random() {
 } // namespace
 
 TEST_CASE("CREATE") {
-  FileByteArray arr("fileArray");
+  FileByteArray arr("fileArray", true);
   KVSRecordsViewer viewer(&arr, nullptr);
 }
 
 TEST_CASE("Single append") {
-  FileByteArray arr("fileArray");
+  FileByteArray arr("fileArray", true);
   KVSRecordsViewer viewer(&arr, nullptr);
 
   KVSRecord record = gen_random();
@@ -49,7 +49,7 @@ TEST_CASE("Single append") {
 }
 
 TEST_CASE("Multiple append") {
-  FileByteArray arr("fileArray");
+  FileByteArray arr("fileArray", true);
   KVSRecordsViewer viewer(&arr, nullptr);
 
   std::vector<KVSRecord> records(1000);
@@ -66,7 +66,7 @@ TEST_CASE("Multiple append") {
 }
 
 TEST_CASE("Multiple is_deleted") {
-  FileByteArray arr("fileArray");
+  FileByteArray arr("fileArray", true);
   KVSRecordsViewer viewer(&arr, nullptr);
 
   std::vector<KVSRecord> records(1000);
@@ -85,7 +85,7 @@ TEST_CASE("Multiple is_deleted") {
 }
 
 TEST_CASE("Multiple markDeleted") {
-  FileByteArray arr("fileArray");
+  FileByteArray arr("fileArray", true);
   KVSRecordsViewer viewer(&arr, nullptr);
 
   std::vector<KVSRecord> records(1000);

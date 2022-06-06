@@ -51,7 +51,7 @@ public:
 private:
   std::fstream data;
   std::string underlying_file;
-  const bool testing; // REMOVE THIS!!!
+  const bool RAII; // REMOVE THIS!!!
 };
 
 using ByteArrayPtr = ByteArray *;
