@@ -32,15 +32,16 @@ bool cmp_memory_type(MemoryType memory_type1, MemoryType memory_type2) {
           memory_type1.get_sst_level() < memory_type2.get_sst_level());
 }
 
-ByteArrayPtr RAMMemoryManager::get_byte_array(MemoryPurpose memory_purpose,
-                                        std::optional<std::size_t> sst_level) {
+ByteArrayPtr
+RAMMemoryManager::get_byte_array(MemoryPurpose memory_purpose,
+                                 std::optional<std::size_t> sst_level) {
   MemoryType memory_type(memory_purpose, sst_level);
   return memory.at(memory_type);
 }
 
 ByteArrayPtr
 RAMMemoryManager::create_byte_array(MemoryPurpose memory_purpose,
-                              std::optional<std::size_t> sst_level) {
+                                    std::optional<std::size_t> sst_level) {
   MemoryType memory_type(memory_purpose, sst_level);
   assert(memory.count(memory_type) == 0);
   memory[memory_type] = ::new RAMByteArray();
@@ -141,14 +142,14 @@ std::string FileMemoryManager::generate_new_filename(MemoryPurpose mp) {
 
 [[deprecated]] ByteArrayPtr
 FileMemoryManager::get_byte_array(MemoryPurpose memory_purpose,
-                            std::optional<std::size_t> sst_level) {
+                                  std::optional<std::size_t> sst_level) {
   MemoryType memory_type(memory_purpose, sst_level);
   return memory.at(memory_type);
 }
 
 [[deprecated]] ByteArrayPtr
 FileMemoryManager::create_byte_array(MemoryPurpose memory_purpose,
-                               std::optional<std::size_t> sst_level) {
+                                     std::optional<std::size_t> sst_level) {
   MemoryType memory_type(memory_purpose, sst_level);
   assert(memory.count(memory_type) == 0);
   memory[memory_type] =
@@ -189,7 +190,8 @@ ByteArrayPtr FileMemoryManager::get_byte_array(MemoryPurpose memory_purpose) {
   return memory.at(memory_type);
 }
 
-ByteArrayPtr FileMemoryManager::create_byte_array(MemoryPurpose memory_purpose) {
+ByteArrayPtr
+FileMemoryManager::create_byte_array(MemoryPurpose memory_purpose) {
   MemoryType memory_type(memory_purpose);
   assert(memory.count(memory_type) == 0);
   std::string fname = generate_new_filename(memory_purpose);

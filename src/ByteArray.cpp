@@ -22,7 +22,8 @@ std::vector<ByteType> RAMByteArray::read(std::size_t l, std::size_t r) {
 
 std::size_t RAMByteArray::size() { return byte_array.size(); }
 
-FileByteArray::FileByteArray(const std::string &s, bool withRAII) : underlying_file(s), RAII(withRAII) {
+FileByteArray::FileByteArray(const std::string &s, bool withRAII)
+    : underlying_file(s), RAII(withRAII) {
   if (std::filesystem::exists(s) && !RAII) {
     data.open(s, std::fstream::ate | std::fstream::binary | std::fstream ::in |
                      std::fstream::out);

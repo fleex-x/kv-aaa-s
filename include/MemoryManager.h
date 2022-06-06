@@ -59,10 +59,11 @@ using cmp_memory_type_type = bool (*)(MemoryType, MemoryType);
 class MemoryManager {
 public:
   virtual ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose,
-                                std::optional<std::size_t> sst_level) = 0;
+                                      std::optional<std::size_t> sst_level) = 0;
 
-  virtual ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose,
-                                   std::optional<std::size_t> sst_level) = 0;
+  virtual ByteArrayPtr
+  create_byte_array(MemoryPurpose memory_purpose,
+                    std::optional<std::size_t> sst_level) = 0;
 
   virtual ByteArrayPtr
   start_overwrite(MemoryPurpose memory_purpose,
@@ -102,10 +103,10 @@ public:
   RAMMemoryManager &operator=(RAMMemoryManager &&) = default;
 
   ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose,
-                        std::optional<std::size_t> sst_level) override;
+                              std::optional<std::size_t> sst_level) override;
 
   ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose,
-                           std::optional<std::size_t> sst_level) override;
+                                 std::optional<std::size_t> sst_level) override;
   ByteArrayPtr start_overwrite(MemoryPurpose memory_purpose,
                                std::optional<std::size_t> sst_level) override;
 
@@ -147,10 +148,10 @@ public:
   FileMemoryManager &operator=(FileMemoryManager &&) = default;
 
   ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose,
-                        std::optional<std::size_t> sst_level) override;
+                              std::optional<std::size_t> sst_level) override;
 
   ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose,
-                           std::optional<std::size_t> sst_level) override;
+                                 std::optional<std::size_t> sst_level) override;
 
   ByteArrayPtr start_overwrite(MemoryPurpose memory_purpose,
                                std::optional<std::size_t> sst_level) override;

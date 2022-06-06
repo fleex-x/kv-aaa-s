@@ -10,7 +10,8 @@ namespace kvaaas {
 struct defer {};
 class BloomFilter {
 public:
-  explicit BloomFilter(defer d, std::size_t function_cnt=5): _function_cnt(function_cnt), _data(SST_SIZE) {
+  explicit BloomFilter(defer d, std::size_t function_cnt = 5)
+      : _function_cnt(function_cnt), _data(SST_SIZE) {
     (void)d;
   }
   explicit BloomFilter(std::size_t elements_cnt, std::size_t function_cnt = 5)
