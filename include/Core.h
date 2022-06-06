@@ -1,10 +1,10 @@
 #pragma once
 
+#include "xxhash.h"
 #include <array>
 #include <cstddef>
 #include <functional>
 #include <vector>
-#include "xxhash.h"
 
 namespace kvaaas {
 constexpr std::size_t KEY_SIZE_BITS = 128;                // TODO read in config
@@ -16,8 +16,6 @@ using ValueType = std::vector<std::byte>;
 using ByteType = std::byte;
 
 } // namespace kvaaas
-
-namespace std {
 
 template <> struct std::hash<kvaaas::KeyType> {
   std::size_t operator()(const kvaaas::KeyType &k) const {
@@ -31,5 +29,3 @@ template <> struct std::hash<kvaaas::KeyType> {
     return XXH32(k.data(), k.size(), 0);
   }
 };
-
-} // namespace std
