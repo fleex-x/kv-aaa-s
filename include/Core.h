@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <functional>
 #include <vector>
+#include <string>
 
 namespace kvaaas {
 constexpr std::size_t KEY_SIZE_BITS = 128;                // TODO read in config

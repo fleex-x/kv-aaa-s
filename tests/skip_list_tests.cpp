@@ -270,6 +270,7 @@ void put(std::map<KeyType, std::uint64_t> &map, SkipList &skip_list,
 
 void find(std::map<KeyType, std::uint64_t> &map, SkipList &skip_list,
           const KeyType &key) {
+  CHECK(map.size() == skip_list.size());
   auto val = skip_list.find(key);
   bool contains_in_map = map.count(key) == 1;
   if (contains_in_map) {
