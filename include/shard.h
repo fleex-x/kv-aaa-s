@@ -27,6 +27,11 @@ struct ShardOption {
   const float busy_coef;
 };
 
+// TODO
+// If FileMM then write log to json in dtor
+// and read in destructor
+// Better to add logic of choosing memory manager etc to private function
+
 struct Shard {
   explicit Shard(std::string root, ShardOption opt)
       : opt(std::move(opt)), root(root) {
@@ -70,8 +75,9 @@ struct Shard {
     log.add(key, offset);
 
     if (log.size() > opt.log_max_size) {
+      std::cerr << "push to skip_list\n";
       skip_list->push_from(log.begin(), log.end());
-      log.clear();
+      log.clear(); // TODO write to json
     }
 
     if (skip_list->size() > opt.sl_max_size) {
