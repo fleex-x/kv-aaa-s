@@ -54,11 +54,11 @@ struct Shard {
         manager->get_or_create_byte_array(MemoryPurpose::SST), RebuildSSTRV{}));
   }
 
-  void add(KeyType key, ValueType value) {
-    // TODO 
+  void add(const KeyType &key, const ValueType &value) {
+    // TODO
     // please, fix calculating stat !!!
-    
-    // Step 1 -- write into KVS 
+
+    // Step 1 -- write into KVS
     KVSRecord rec;
     rec.value = std::move(value);
     rec.key = key;
@@ -66,7 +66,7 @@ struct Shard {
     rec.value_size = rec.value.size();
     auto offset = kvs_viewer->append(std::move(rec));
 
-    // Step 2 -- into log 
+    // Step 2 -- into log
     log.add(key, offset);
 
     if (log.size() > opt.log_max_size) {
@@ -74,10 +74,61 @@ struct Shard {
       log.clear();
     }
 
+    if (skip_list->size() > opt.sl_max_size) {
+      auto bytes_for_new_sst = manager->start_overwrite(MemoryPurpose::SST);
+      auto view_for_new_sst = SSTRecordViewer{bytes_for_new_sst, NewSSTRV{}};
+      // auto new_sst =
+      //    SST::merge_into_sst(skip_list->begin(), skip_list->end(),
+      //    sst->begin(),
+      //                         sst->end(), view_for_new_sst);
+    }
 
+    // TODO recalc stats
+    bool rebuild = false; // TODO somehow calculate to rebuild
+    if (rebuild) {
+      do_rebuid();
+    }
+  }
+
+  void remove(const KeyType &key) {
+    std::optional<std::uint64_t> offset = log.get_offset(key);
+    if (offset) {
+      kvs_viewer->mark_as_deleted(*offset);
+      return;
+    }
+    offset = skip_list->find(key);
+    if (offset) {
+      kvs_viewer->mark_as_deleted(*offset);
+      return;
+    }
+    if (sst->contains(key)) {
+      kvs_viewer->mark_as_deleted(sst->find_offset(key));
+      return;
+    }
+  }
+
+  std::optional<std::pair<KeyType, ValueType>> get(const KeyType &key) {
+    std::optional<std::uint64_t> offset = log.get_offset(key);
+    if (offset) {
+      auto rec = kvs_viewer->read_record(*offset);
+      return std::pair{rec.key, rec.value};
+    }
+    offset = skip_list->find(key);
+    if (offset) {
+      auto rec = kvs_viewer->read_record(*offset);
+      return std::pair{rec.key, rec.value};
+    }
+    if (sst->contains(key)) {
+      auto rec = kvs_viewer->read_record(sst->find_offset(key));
+      return std::pair{rec.key, rec.value};
+    }
+
+    return std::nullopt;
   }
 
 private:
+  void do_rebuid() {}
+
   ShardOption opt;
   std::string root;
   std::unique_ptr<MemoryManager> manager;
