@@ -3,8 +3,6 @@
 #include <fstream>
 #include <vector>
 
-#define BA_TESTMODE false // false because I cannot normally test FileMM 
-
 namespace kvaaas {
 
 class ByteArray {
@@ -36,7 +34,7 @@ public:
 
 class FileByteArray final : public ByteArray {
 public:
-  explicit FileByteArray(const std::string &s);
+  explicit FileByteArray(const std::string &s, bool testing = false);
 
   void append(const std::vector<ByteType> &bytes) override;
 
@@ -53,6 +51,7 @@ public:
 private:
   std::fstream data;
   std::string underlying_file;
+  const bool testing; // REMOVE THIS!!!
 };
 
 using ByteArrayPtr = ByteArray *;

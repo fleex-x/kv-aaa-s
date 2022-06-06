@@ -22,8 +22,8 @@ std::vector<ByteType> RAMByteArray::read(std::size_t l, std::size_t r) {
 
 std::size_t RAMByteArray::size() { return byte_array.size(); }
 
-FileByteArray::FileByteArray(const std::string &s) : underlying_file(s) {
-  if (std::filesystem::exists(s) && !BA_TESTMODE) {
+FileByteArray::FileByteArray(const std::string &s, bool test) : underlying_file(s), testing(test) {
+  if (std::filesystem::exists(s) && !testing) {
     data.open(s, std::fstream::ate | std::fstream::binary | std::fstream ::in |
                      std::fstream::out);
   } else {
@@ -56,7 +56,7 @@ std::size_t FileByteArray::size() { return data.tellp(); }
 
 FileByteArray::~FileByteArray() {
   data.close();
-  if (BA_TESTMODE) {
+  if (testing) {
     std::remove(underlying_file.c_str());
   }
 }
