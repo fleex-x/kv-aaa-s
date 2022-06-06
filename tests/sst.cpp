@@ -8,7 +8,7 @@ namespace {
 using namespace kvaaas;
 
 TEST_CASE("SSTRecordsViewer") {
-  FileByteArray arr("SST1");
+  FileByteArray arr("SST1", true);
   SSTRecordViewer viewer(&arr, NewSSTRV{});
   CHECK(viewer.size() == 0);
 
@@ -31,7 +31,7 @@ TEST_CASE("SSTRecordsViewer") {
 }
 
 TEST_CASE("SSTJustWorks") {
-  FileByteArray arr("SST1");
+  FileByteArray arr("SST1", true);
   SSTRecordViewer viewer(&arr, NewSSTRV{});
 
   SSTRecord rec;
@@ -49,7 +49,7 @@ TEST_CASE("SSTJustWorks") {
 }
 
 TEST_CASE("SSTEmpty") {
-  FileByteArray arr("SST1");
+  FileByteArray arr("SST1", true);
   SSTRecordViewer viewer(&arr, NewSSTRV{});
 
   SST sst(viewer);
@@ -57,7 +57,7 @@ TEST_CASE("SSTEmpty") {
 }
 
 TEST_CASE("SSTMerge") {
-  FileByteArray arr1("SST1"), arr2("SST2"), arr3("SST3");
+  FileByteArray arr1("SST1", true), arr2("SST2", true), arr3("SST3", true);
   SSTRecordViewer view1(&arr1, NewSSTRV{}), view2(&arr2, NewSSTRV{}),
       view3(&arr3, NewSSTRV{});
 
@@ -150,7 +150,7 @@ TEST_CASE("SSTStress") {
   std::vector<SSTRecord> vec3(vec1.size() + vec2.size());
   std::merge(vec1.begin(), vec1.end(), vec2.begin(), vec2.end(), vec3.begin());
 
-  FileByteArray arr1("SST1"), arr2("SST2"), arr3("SST3");
+  FileByteArray arr1("SST1", true), arr2("SST2", true), arr3("SST3", true);
   SSTRecordViewer view1(&arr1, NewSSTRV{}), view2(&arr2, NewSSTRV{}),
       view3(&arr3, NewSSTRV{});
   for (const auto &rec : vec1) {
@@ -173,7 +173,7 @@ TEST_CASE("SSTStress") {
 }
 
 TEST_CASE("SSTRecordViewerRebuild") {
-  FileByteArray arr("SST1");
+  FileByteArray arr("SST1", true);
   SSTRecordViewer view(&arr, NewSSTRV{});
   SSTRecord rec{{std::byte{0}, std::byte{0}, std::byte{0}}, 0};
   view.append(rec);
