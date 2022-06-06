@@ -58,10 +58,10 @@ using cmp_memory_type_type = bool (*)(MemoryType, MemoryType);
 
 class MemoryManager {
 public:
-  virtual ByteArrayPtr get_file(MemoryPurpose memory_purpose,
+  virtual ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose,
                                 std::optional<std::size_t> sst_level) = 0;
 
-  virtual ByteArrayPtr create_file(MemoryPurpose memory_purpose,
+  virtual ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose,
                                    std::optional<std::size_t> sst_level) = 0;
 
   virtual ByteArrayPtr
@@ -74,9 +74,9 @@ public:
   virtual void remove(MemoryPurpose memory_purpose,
                       std::optional<std::size_t> sst_level) = 0;
 
-  virtual ByteArrayPtr get_file(MemoryPurpose memory_purpose) = 0;
+  virtual ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose) = 0;
 
-  virtual ByteArrayPtr create_file(MemoryPurpose memory_purpose) = 0;
+  virtual ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose) = 0;
 
   virtual ByteArrayPtr start_overwrite(MemoryPurpose memory_purpose) = 0;
 
@@ -101,10 +101,10 @@ public:
   RAMMemoryManager(RAMMemoryManager &&) = default;
   RAMMemoryManager &operator=(RAMMemoryManager &&) = default;
 
-  ByteArrayPtr get_file(MemoryPurpose memory_purpose,
+  ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose,
                         std::optional<std::size_t> sst_level) override;
 
-  ByteArrayPtr create_file(MemoryPurpose memory_purpose,
+  ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose,
                            std::optional<std::size_t> sst_level) override;
   ByteArrayPtr start_overwrite(MemoryPurpose memory_purpose,
                                std::optional<std::size_t> sst_level) override;
@@ -115,9 +115,9 @@ public:
   void remove(MemoryPurpose memory_purpose,
               std::optional<std::size_t> sst_level) override;
 
-  ByteArrayPtr get_file(MemoryPurpose memory_purpose) override;
+  ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose) override;
 
-  ByteArrayPtr create_file(MemoryPurpose memory_purpose) override;
+  ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose) override;
 
   ByteArrayPtr start_overwrite(MemoryPurpose memory_purpose) override;
 
@@ -146,10 +146,10 @@ public:
   FileMemoryManager(FileMemoryManager &&) = default;
   FileMemoryManager &operator=(FileMemoryManager &&) = default;
 
-  ByteArrayPtr get_file(MemoryPurpose memory_purpose,
+  ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose,
                         std::optional<std::size_t> sst_level) override;
 
-  ByteArrayPtr create_file(MemoryPurpose memory_purpose,
+  ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose,
                            std::optional<std::size_t> sst_level) override;
 
   ByteArrayPtr start_overwrite(MemoryPurpose memory_purpose,
@@ -161,9 +161,9 @@ public:
   void remove(MemoryPurpose memory_purpose,
               std::optional<std::size_t> sst_level) override;
 
-  ByteArrayPtr get_file(MemoryPurpose memory_purpose) override;
+  ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose) override;
 
-  ByteArrayPtr create_file(MemoryPurpose memory_purpose) override;
+  ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose) override;
 
   ByteArrayPtr start_overwrite(MemoryPurpose memory_purpose) override;
 
@@ -173,7 +173,7 @@ public:
 
   ~FileMemoryManager() noexcept override;
 
-  static FileMemoryManager from_file(std::string);
+  static FileMemoryManager from_dir(std::string);
 
 private:
   std::string generate_new_filename(MemoryPurpose);

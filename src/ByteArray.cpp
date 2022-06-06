@@ -1,6 +1,7 @@
 #include "ByteArray.h"
 #include "Core.h"
 #include <filesystem>
+#include <iostream>
 
 namespace kvaaas {
 

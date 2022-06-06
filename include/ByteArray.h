@@ -3,7 +3,7 @@
 #include <fstream>
 #include <vector>
 
-#define BA_TESTMODE true
+#define BA_TESTMODE false
 
 namespace kvaaas {
 
