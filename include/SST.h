@@ -22,8 +22,11 @@ struct SSTRecord {
 struct NewSSTRV {};
 struct RebuildSSTRV {};
 
+// It just take an underlaying bytearrat
+// If wanna EMPTY one, than inject an empty byte array!
 struct SSTRecordViewer {
-  SSTRecordViewer(ByteArrayPtr data, NewSSTRV) : _data(data) {}
+  SSTRecordViewer(ByteArrayPtr data, NewSSTRV)
+      : _data(data) {} // remove later ??
 
   void append(const SSTRecord &rec) {
     std::vector<ByteType> vec(rec.key.size() + sizeof(std::uint64_t));

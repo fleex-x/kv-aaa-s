@@ -77,6 +77,8 @@ public:
 
   virtual ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose) = 0;
 
+  virtual ByteArrayPtr get_or_create_byte_array(MemoryPurpose memory_purpose) = 0;
+
   virtual ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose) = 0;
 
   virtual ByteArrayPtr start_overwrite(MemoryPurpose memory_purpose) = 0;
@@ -117,6 +119,8 @@ public:
               std::optional<std::size_t> sst_level) override;
 
   ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose) override;
+
+  ByteArrayPtr get_or_create_byte_array(MemoryPurpose memory_purpose) override;
 
   ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose) override;
 
@@ -163,6 +167,8 @@ public:
               std::optional<std::size_t> sst_level) override;
 
   ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose) override;
+
+  ByteArrayPtr get_or_create_byte_array(MemoryPurpose memory_purpose) override;
 
   ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose) override;
 
