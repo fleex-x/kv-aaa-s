@@ -11,7 +11,6 @@ struct Log {
   std::size_t size() const noexcept { return _map.size(); }
   void add(const KeyType &key, std::uint64_t offset) {
     _map.emplace(key, offset);
-    std::cerr << "Add with offset=" << offset << std::endl;
   }
 
   void remove(const KeyType &key) { _map.erase(key); }

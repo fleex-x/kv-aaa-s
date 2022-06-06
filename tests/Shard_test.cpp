@@ -70,4 +70,47 @@ TEST_CASE("MergeIntoSkipList") {
     CHECK((*shard.get(keys[i])) == std::pair{keys[i], values[i]});
   }
 }
+
+TEST_CASE("MergeIntoSST") {
+  Shard shard("shard_test", little_in_ram);
+  const std::size_t N = 1011;
+  std::array<KeyType, N> keys{};
+  std::array<ValueType, N> values;
+  for (std::size_t i = 0; i < N; ++i) {
+    keys[i] = {gen_byte(), gen_byte(), gen_byte()};
+    values[i] = ValueType(100, gen_byte());
+    shard.add(keys[i], values[i]);
+  }
+
+  for (std::size_t i = 0; i < N; ++i) {
+    CHECK(shard.get(keys[i]));
+    CHECK((*shard.get(keys[i])) == std::pair{keys[i], values[i]});
+  }
+}
+TEST_CASE("Remove") {
+  Shard shard("shard_test", little_in_ram);
+  const std::size_t N = 1200;
+  std::array<KeyType, N> keys{};
+  std::array<ValueType, N> values;
+  for (std::size_t i = 0; i < N; ++i) {
+    keys[i] = {gen_byte(), gen_byte(), gen_byte()};
+    values[i] = ValueType(100, gen_byte());
+    shard.add(keys[i], values[i]);
+  }
+  for (std::size_t i = 0; i < N; ++i) {
+    if (i % 2) {
+      shard.remove(keys[i]);
+    }
+  }
+
+  for (std::size_t i = 0; i < N; ++i) {
+
+    if (i % 2) {
+      CHECK(!shard.get(keys[i]));
+    } else {
+      CHECK(shard.get(keys[i]));
+      CHECK((*shard.get(keys[i])) == std::pair{keys[i], values[i]});
+    }
+  }
+}
 } // namespace

@@ -75,7 +75,6 @@ struct Shard {
     log.add(key, offset);
 
     if (log.size() > opt.log_max_size) {
-      std::cerr << "push to skip_list\n";
       skip_list->push_from(log.begin(), log.end());
       log.clear(); // TODO write to json
     }
@@ -105,48 +104,44 @@ struct Shard {
     // TODO recalc stats
     bool rebuild = false; // TODO somehow calculate to rebuild
     if (rebuild) {
-      do_rebuid();
+      do_rebuild();
     }
   }
 
   void remove(const KeyType &key) {
-    std::optional<std::uint64_t> offset = log.get_offset(key);
+    std::optional<std::uint64_t> offset = get_offset(key);
     if (offset) {
       kvs_viewer->mark_as_deleted(*offset);
-      return;
-    }
-    offset = skip_list->find(key);
-    if (offset) {
-      kvs_viewer->mark_as_deleted(*offset);
-      return;
-    }
-    if (sst->contains(key)) {
-      kvs_viewer->mark_as_deleted(sst->find_offset(key));
-      return;
     }
   }
 
   std::optional<std::pair<KeyType, ValueType>> get(const KeyType &key) {
-    std::optional<std::uint64_t> offset = log.get_offset(key);
+    std::optional<std::uint64_t> offset = get_offset(key);
     if (offset) {
       auto rec = kvs_viewer->read_record(*offset);
-      return std::pair{rec.key, rec.value};
+      if (rec.is_deleted == std::byte(0))
+        return std::pair{rec.key, rec.value};
+    } else {
     }
-    offset = skip_list->find(key);
-    if (offset) {
-      auto rec = kvs_viewer->read_record(*offset);
-      return std::pair{rec.key, rec.value};
-    }
-    if (sst->contains(key)) {
-      auto rec = kvs_viewer->read_record(sst->find_offset(key));
-      return std::pair{rec.key, rec.value};
-    }
-
     return std::nullopt;
   }
 
 private:
-  void do_rebuid() {}
+  void do_rebuild() {}
+  std::optional<std::uint64_t> get_offset(const KeyType &key) {
+    std::optional<std::uint64_t> offset = log.get_offset(key);
+    if (offset) {
+      return offset;
+    }
+    offset = skip_list->find(key);
+    if (offset) {
+      return offset;
+    }
+    if (sst->contains(key)) {
+      return sst->find_offset(key);
+    }
+    return std::nullopt;
+  }
 
   ShardOption opt;
   std::string root;

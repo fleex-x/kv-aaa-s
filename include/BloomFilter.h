@@ -17,7 +17,7 @@ public:
     std::uniform_int_distribution<std::mt19937::result_type> dist(0,
                                                                   _data.size());
     for (size_t i = 0; i < _seeds.size(); ++i) {
-      _seeds[i] = dist(rng);
+      _seeds[i] = i; // dist(rng);
     }
   }
 

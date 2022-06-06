@@ -78,14 +78,11 @@ void SkipList::insert_after_parents(const std::vector<std::uint64_t> &parents,
 }
 
 void SkipList::put(const KeyType &key, std::uint64_t offset) {
-  std::cerr << "In SL::Put(..)\n";
   if (!bottom.has_head()) {
     SLBottomLevelRecord new_record(key, offset);
     insert_as_head_bottom_level(new_record);
     return;
   }
-
-  std::cerr << "After first if";
 
   std::vector<std::uint64_t> parents(levels_count, NULL_NODE);
   std::uint64_t bottom_node = NULL_NODE;
@@ -98,8 +95,6 @@ void SkipList::put(const KeyType &key, std::uint64_t offset) {
       std::uint64_t cur_node = upper.get_head(upper_level);
       while (upper_level >= 0) {
         while (true) {
-          // this one is infinite
-          // std::cerr << __FILE_NAME__ << ":" << __LINE__ << std::endl;
           uint64_t next_node = upper.get_next(cur_node);
           if (next_node != NULL_NODE && upper[next_node].key <= key) {
             cur_node = next_node;
@@ -120,7 +115,6 @@ void SkipList::put(const KeyType &key, std::uint64_t offset) {
     bottom_node = bottom.get_head();
   }
   while (true) {
-    std::cerr << "Inside while(true) skip list" << std::endl;
     uint64_t next_node = bottom.get_next(bottom_node);
     if (next_node != NULL_NODE && bottom[next_node].key <= key) {
       bottom_node = next_node;

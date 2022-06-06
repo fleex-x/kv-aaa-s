@@ -41,7 +41,6 @@ public:
 
   template <typename It> void push_from(It begin, It end) {
     for (It it = begin; it != end; ++it) {
-      std::cerr << "New put" << std::endl;
       put(it->first, it->second);
     }
   }
