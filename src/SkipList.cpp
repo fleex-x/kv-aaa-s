@@ -176,4 +176,8 @@ std::optional<std::uint64_t> SkipList::find(const KeyType &key) {
 
 bool SkipList::has_key(const KeyType &key) { return find(key).has_value(); }
 
+std::uint64_t SkipList::size() const {
+    return bottom.get_elems_count();
+}
+
 } // namespace kvaaas

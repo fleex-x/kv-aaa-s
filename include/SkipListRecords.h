@@ -42,6 +42,8 @@ public:
   std::uint64_t get_head();
   std::uint64_t append_record(const SLBottomLevelRecord &record);
   void set_head(std::uint64_t head);
+
+  std::uint64_t get_elems_count() const;
 };
 
 struct SLUpperLevelRecord {
