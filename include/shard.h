@@ -77,10 +77,23 @@ struct Shard {
     if (skip_list->size() > opt.sl_max_size) {
       auto bytes_for_new_sst = manager->start_overwrite(MemoryPurpose::SST);
       auto view_for_new_sst = SSTRecordViewer{bytes_for_new_sst, NewSSTRV{}};
-      // auto new_sst =
-      //    SST::merge_into_sst(skip_list->begin(), skip_list->end(),
-      //    sst->begin(),
-      //                         sst->end(), view_for_new_sst);
+      auto new_sst =
+          SST::merge_into_sst(skip_list->begin(), skip_list->end(),
+                              sst->begin(), sst->end(), view_for_new_sst);
+      manager->end_overwrite(MemoryPurpose::SST);
+      sst.emplace(new_sst);
+      auto sl_u = manager->start_overwrite(MemoryPurpose::SKIP_LIST_UL);
+      auto sl_u_h = manager->start_overwrite(MemoryPurpose::SKIP_LIST_UL_H);
+      auto sl_b = manager->start_overwrite(MemoryPurpose::SKIP_LIST_BL);
+
+      auto sl_upper_viewer = SLUpperLevelRecordViewer(sl_u, sl_u_h);
+      auto sl_bottom_viewer = SLBottomLevelRecordViewer(sl_b);
+
+      skip_list.emplace(sl_bottom_viewer, sl_upper_viewer);
+
+      manager->end_overwrite(MemoryPurpose::SKIP_LIST_UL);
+      manager->end_overwrite(MemoryPurpose::SKIP_LIST_UL_H);
+      manager->end_overwrite(MemoryPurpose::SKIP_LIST_BL);
     }
 
     // TODO recalc stats

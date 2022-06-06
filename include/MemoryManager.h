@@ -77,7 +77,8 @@ public:
 
   virtual ByteArrayPtr get_byte_array(MemoryPurpose memory_purpose) = 0;
 
-  virtual ByteArrayPtr get_or_create_byte_array(MemoryPurpose memory_purpose) = 0;
+  virtual ByteArrayPtr
+  get_or_create_byte_array(MemoryPurpose memory_purpose) = 0;
 
   virtual ByteArrayPtr create_byte_array(MemoryPurpose memory_purpose) = 0;
 

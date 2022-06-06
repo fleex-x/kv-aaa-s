@@ -17,7 +17,6 @@ std::size_t KVSRecordsViewer::append(const KVSRecord &record) {
                   sizeof(record.value_size),
               record.value.data(), record.value_size);
 
-
   auto rec = byte_arr->size();
   byte_arr->append(record_chars);
   return rec;

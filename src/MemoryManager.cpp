@@ -84,7 +84,8 @@ ByteArrayPtr RAMMemoryManager::create_byte_array(MemoryPurpose memory_purpose) {
   return memory[memory_type];
 }
 
-ByteArrayPtr RAMMemoryManager::get_or_create_byte_array(MemoryPurpose memory_purpose) {
+ByteArrayPtr
+RAMMemoryManager::get_or_create_byte_array(MemoryPurpose memory_purpose) {
   MemoryType mt(memory_purpose);
   if (memory.count(mt) == 0) {
     return create_byte_array(memory_purpose);
@@ -200,7 +201,8 @@ ByteArrayPtr FileMemoryManager::get_byte_array(MemoryPurpose memory_purpose) {
   return memory.at(memory_type);
 }
 
-ByteArrayPtr FileMemoryManager::get_or_create_byte_array(MemoryPurpose memory_purpose) {
+ByteArrayPtr
+FileMemoryManager::get_or_create_byte_array(MemoryPurpose memory_purpose) {
   MemoryType mt(memory_purpose);
   if (memory.count(mt) == 0) {
     return create_byte_array(memory_purpose);

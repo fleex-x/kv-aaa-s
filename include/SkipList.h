@@ -31,7 +31,6 @@ private:
   std::random_device rd;
   std::mt19937 rng{0};
   std::uniform_int_distribution<std::mt19937::result_type> dist{0, 1};
-  std::uint64_t size_ = 0;
 
 public:
   SkipList(const SLBottomLevelRecordViewer &bottom_,
