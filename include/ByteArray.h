@@ -3,8 +3,6 @@
 #include <fstream>
 #include <vector>
 
-#define BA_TESTMODE true
-
 namespace kvaaas {
 
 class ByteArray {
@@ -19,8 +17,6 @@ public:
 
   virtual ~ByteArray() = default;
 };
-
-using ByteArrayPtr = ByteArray *;
 
 class RAMByteArray : public ByteArray {
 private:
@@ -37,12 +33,8 @@ public:
 };
 
 class FileByteArray final : public ByteArray {
-private:
-  std::fstream data;
-  std::string file_name;
-
 public:
-  explicit FileByteArray(const std::string &s);
+  explicit FileByteArray(const std::string &s, bool testing = false);
 
   void append(const std::vector<ByteType> &bytes) override;
 
@@ -53,5 +45,16 @@ public:
   std::size_t size() override;
 
   ~FileByteArray() override;
+
+  std::string file_name() const noexcept { return underlying_file; }
+
+private:
+  std::fstream data;
+  std::string underlying_file;
+  const bool RAII; // REMOVE THIS!!!
 };
+
+using ByteArrayPtr = ByteArray *;
+using FileByteArrayPtr = FileByteArray *;
+
 } // namespace kvaaas

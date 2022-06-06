@@ -28,7 +28,7 @@ std::vector<ByteType> gen_random(int n) {
 TEST_CASE("Create") { FileByteArray arr("fileArray"); }
 
 TEST_CASE("Append") {
-  FileByteArray arr("fileArray");
+  FileByteArray arr("fileArray", true);
   auto testArr = gen_random(1000);
   arr.append(testArr);
 
@@ -36,7 +36,7 @@ TEST_CASE("Append") {
 }
 
 TEST_CASE("Multiple append") {
-  FileByteArray arr("fileArray");
+  FileByteArray arr("fileArray", true);
   std::vector<std::vector<ByteType>> bArrs(100);
 
   for (auto &bArr : bArrs) {
@@ -52,7 +52,7 @@ TEST_CASE("Multiple append") {
 }
 
 TEST_CASE("Multiple append, but different offsets") {
-  FileByteArray arr("fileArray");
+  FileByteArray arr("fileArray", true);
   std::vector<std::vector<ByteType>> bArrs(100);
 
   std::random_device rd;
@@ -72,7 +72,7 @@ TEST_CASE("Multiple append, but different offsets") {
 }
 
 TEST_CASE("Rewrite") {
-  FileByteArray arr("fileArray");
+  FileByteArray arr("fileArray", true);
   auto startArr = gen_random(2000000);
   arr.append(startArr);
 
@@ -102,7 +102,7 @@ TEST_CASE("Rewrite") {
 }
 
 TEST_CASE("Size") {
-  FileByteArray arr("fileArray");
+  FileByteArray arr("fileArray", true);
   auto testArr = gen_random(10000);
   arr.append(testArr);
   CHECK(arr.size() == 10000);
