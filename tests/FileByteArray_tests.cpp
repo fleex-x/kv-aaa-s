@@ -23,6 +23,21 @@ std::vector<ByteType> gen_random(int n) {
 
   return arr;
 }
+
+ByteType *gen_random_ptr(int n) {
+
+  auto *ptr = new ByteType[n];
+  std::random_device rd;
+  std::mt19937_64 rnd(rd());
+  std::uniform_int_distribution<unsigned char> dist;
+
+  for (int i =0; i < n; i++) {
+    ptr[i] = static_cast<std::byte>(dist(rnd));
+  }
+
+  return ptr;
+}
+
 } // namespace
 
 TEST_CASE("Create") { FileByteArray arr("fileArray"); }
@@ -110,3 +125,103 @@ TEST_CASE("Size") {
   arr.append(testArr);
   CHECK(arr.size() == 20000);
 }
+
+TEST_CASE("Append, but char*") {
+  FileByteArray arr("fileArray", true);
+  auto testArr = gen_random_ptr(1000);
+  arr.append(testArr, 1000);
+
+  auto ptr = arr.read_ptr(0, 1000);
+  for (int j = 0; j < 1000; j++) {
+    CHECK(ptr[j] == testArr[j]);
+  }
+}
+
+TEST_CASE("Multiple append, but char*") {
+  FileByteArray arr("fileArray", true);
+  std::vector<ByteType *> bArrs(100);
+
+  for (auto &bArr : bArrs) {
+    bArr = gen_random_ptr(1000);
+    arr.append(bArr, 1000);
+  }
+
+  std::uint64_t offset = 0;
+  for (auto &bArr : bArrs) {
+    auto ptr = arr.read_ptr(offset, offset + 1000);
+    for (int i = 0; i < 1000; i++) {
+      CHECK(ptr[i] == bArr[i]);
+    }
+    offset += 1000;
+  }
+}
+/*
+TEST_CASE("Multiple append, but different offsets and char*") {
+  FileByteArray arr("fileArray", true);
+  std::vector<ByteType *> bArrs(100);
+  std::vector<int> sizes(100);
+  std::random_device rd;
+  std::mt19937_64 rnd(rd());
+  std::uniform_int_distribution<int> dist(10000, 50000);
+
+  int i = 0;
+  for (auto &bArr : bArrs) {
+    int n = dist(rnd);
+    bArr = gen_random_ptr(n);
+    arr.append(bArr, n);
+    sizes[i++] = n;
+  }
+
+  std::uint64_t offset = 0;
+  for (std::size_t i = 0; i < bArrs.size(); i++) {
+    auto ptr = arr.read_ptr(offset, offset + sizes[i]);
+    for (int j = 0; j < sizes[i]; j++){
+      CHECK(ptr[j] == bArrs[i][j]);
+    }
+    offset += sizes[i];
+  }
+}
+
+TEST_CASE("Rewrite, but char*") {
+  FileByteArray arr("fileArray", true);
+  auto startArr = gen_random_ptr(2'000'000);
+  arr.append(startArr, 2'000'000);
+
+  auto ptr = arr.read_ptr(0, 2'000'000);
+  for (std::size_t j = 0; j < 2'000'000; j++) {
+    CHECK(startArr[j] == ptr[j]);
+  }
+
+  std::random_device rd;
+  std::mt19937_64 rnd(rd());
+  std::uniform_int_distribution<int> dist(10000, 50000);
+
+  int l = dist(rnd);
+  int r = l + dist(rnd);
+
+  auto changedArr = gen_random_ptr(r - l);
+
+  for (int i = 0, j = l; j < r; j++, i++) {
+    startArr[j] = changedArr[i];
+  }
+
+  arr.rewrite(l, changedArr, r - l);
+  CHECK(arr.size() == 2'000'000);
+
+  for (std::size_t j = 0; j < 2'000'000; j++) {
+    CHECK(startArr[j] == ptr[j]);
+  }
+
+  CHECK(arr.size() == 2'000'000);
+}
+
+TEST_CASE("Size, but char*") {
+  FileByteArray arr("fileArray", true);
+  auto testArr = gen_random_ptr(10000);
+  arr.append(testArr, 10000);
+  CHECK(arr.size() == 10000);
+
+  arr.append(testArr, 10000);
+  CHECK(arr.size() == 20000);
+}
+ */

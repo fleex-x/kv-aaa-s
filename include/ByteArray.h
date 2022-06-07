@@ -11,9 +11,18 @@ public:
 
   virtual std::vector<ByteType>
   read(std::size_t l, std::size_t r) = 0; //[l, r) -- semi-interval
+
   virtual void rewrite(std::size_t begin,
                        const std::vector<ByteType> &bytes) = 0;
+
   virtual std::size_t size() = 0;
+
+  virtual void append(const ByteType *bytes, std::size_t n) = 0;
+
+  virtual ByteType *read_ptr(std::size_t l, std::size_t r) = 0;
+
+  virtual void rewrite(std::size_t begin, const ByteType *bytes,
+                       std::size_t n) = 0;
 
   virtual ~ByteArray() = default;
 };
@@ -29,6 +38,13 @@ public:
 
   void rewrite(std::size_t begin, const std::vector<ByteType> &bytes) override;
 
+  void append(const ByteType *bytes, std::size_t n) override;
+
+  ByteType *read_ptr(std::size_t l, std::size_t r) override;
+
+  void rewrite(std::size_t begin, const ByteType *bytes,
+               std::size_t n) override;
+
   std::size_t size() override;
 };
 
@@ -40,7 +56,15 @@ public:
 
   std::vector<ByteType> read(std::size_t l,
                              std::size_t r) override; //[l, r) -- semi-interval
+
   void rewrite(std::size_t begin, const std::vector<ByteType> &bytes) override;
+
+  void append(const ByteType *bytes, std::size_t n) override;
+
+  ByteType *read_ptr(std::size_t l, std::size_t r) override;
+
+  void rewrite(std::size_t begin, const ByteType *bytes,
+               std::size_t n) override;
 
   std::size_t size() override;
 
