@@ -84,6 +84,15 @@ ByteArrayPtr RAMMemoryManager::create_byte_array(MemoryPurpose memory_purpose) {
   return memory[memory_type];
 }
 
+ByteArrayPtr
+RAMMemoryManager::get_or_create_byte_array(MemoryPurpose memory_purpose) {
+  MemoryType mt(memory_purpose);
+  if (memory.count(mt) == 0) {
+    return create_byte_array(memory_purpose);
+  }
+  return get_byte_array(memory_purpose);
+}
+
 ByteArrayPtr RAMMemoryManager::start_overwrite(MemoryPurpose memory_purpose) {
   MemoryType memory_type(memory_purpose);
   assert(memory_to_overwrite.count(memory_type) == 0);
@@ -116,7 +125,9 @@ RAMMemoryManager::~RAMMemoryManager() noexcept {
 // FileMemoryManager
 
 FileMemoryManager::FileMemoryManager(std::string root)
-    : root(root), manifest_json() {}
+    : root(root), manifest_json() {
+  update_manifest();
+}
 
 // TODO do not support sst level yet
 FileMemoryManager::FileMemoryManager(nlohmann::json mem_json, std::string root)
@@ -188,6 +199,15 @@ FileMemoryManager::remove(MemoryPurpose memory_purpose,
 ByteArrayPtr FileMemoryManager::get_byte_array(MemoryPurpose memory_purpose) {
   MemoryType memory_type(memory_purpose);
   return memory.at(memory_type);
+}
+
+ByteArrayPtr
+FileMemoryManager::get_or_create_byte_array(MemoryPurpose memory_purpose) {
+  MemoryType mt(memory_purpose);
+  if (memory.count(mt) == 0) {
+    return create_byte_array(memory_purpose);
+  }
+  return get_byte_array(memory_purpose);
 }
 
 ByteArrayPtr

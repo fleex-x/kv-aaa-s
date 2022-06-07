@@ -22,8 +22,11 @@ struct SSTRecord {
 struct NewSSTRV {};
 struct RebuildSSTRV {};
 
+// It just take an underlaying bytearrat
+// If wanna EMPTY one, than inject an empty byte array!
 struct SSTRecordViewer {
-  SSTRecordViewer(ByteArrayPtr data, NewSSTRV) : _data(data) {}
+  SSTRecordViewer(ByteArrayPtr data, NewSSTRV)
+      : _data(data) {} // remove later ??
 
   void append(const SSTRecord &rec) {
     std::vector<ByteType> vec(rec.key.size() + sizeof(std::uint64_t));
@@ -102,21 +105,23 @@ struct SST {
   std::uint64_t size() const noexcept { return _rec_view.size(); }
 
   bool contains(const KeyType &key) {
-    if (!bf.has_key(key))
+    if (!bf.has_key(key)) {
       return false;
+    }
     std::int64_t left = 0;                 // less or equal
     std::int64_t right = _rec_view.size(); // not valid
 
     while (left + 1 < right) {
       auto mid = left + (right - left) / 2;
       auto rec = _rec_view.get_record(mid);
-      if (rec.key == key) {
+      if (rec.key <= key) {
         left = mid;
       } else {
         right = mid;
       }
     }
     auto rec = _rec_view.get_record(left);
+
     return rec.key == key;
   }
 
@@ -128,7 +133,7 @@ struct SST {
     while (left + 1 < right) {
       auto mid = left + (right - left) / 2;
       auto rec = _rec_view.get_record(mid);
-      if (rec.key == key) {
+      if (rec.key <= key) {
         left = mid;
       } else {
         right = mid;
@@ -136,7 +141,6 @@ struct SST {
     }
     auto rec = _rec_view.get_record(left);
     if (rec.key != key) {
-      std::cerr << "record key != key" << std::endl;
     }
     return rec.offset;
   }
@@ -145,7 +149,6 @@ struct SST {
   static SST merge_into_sst(It1 begin1, It1 end1, It2 begin2, It2 end2,
                             SSTRecordViewer viewer) {
     if (viewer.size() != 0) {
-      std::cerr << "Assume viewer size for merge = 0!" << std::endl;
     }
 
     while (begin1 != end1 && begin2 != end2) {

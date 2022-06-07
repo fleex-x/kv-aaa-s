@@ -7,10 +7,10 @@
 namespace kvaaas {
 
 struct KVSRecord {
-  KeyType key;
-  ByteType is_deleted;
-  std::uint64_t value_size;
-  ValueType value;
+  KeyType key{};
+  ByteType is_deleted{};
+  std::uint64_t value_size{};
+  ValueType value{};
 };
 
 class KVSRecordsViewer {
@@ -23,7 +23,7 @@ public:
 
   KVSRecordsViewer(ByteArray *arr, void *compressor);
 
-  /* Expect<offset, status>*/ void append(KVSRecord record);
+  /* Expect<offset, status>*/ std::size_t append(const KVSRecord &record);
 
   static std::uint64_t get_value_size(const KVSRecord &record);
 

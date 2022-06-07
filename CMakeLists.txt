@@ -38,3 +38,4 @@ add_executable(FileByteArrayTest tests/doctest_main.cpp tests/FileByteArray_test
 add_executable(SSTTest tests/doctest_main.cpp tests/sst.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 add_executable(LOGTest tests/doctest_main.cpp tests/log_test.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 add_executable(FileMemoryManagerTest tests/doctest_main.cpp tests/doctest.h tests/file_mm_test.cpp ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
+add_executable(ShardTest tests/doctest_main.cpp tests/doctest.h tests/Shard_test.cpp ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})

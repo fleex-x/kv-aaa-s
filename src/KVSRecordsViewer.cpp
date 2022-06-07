@@ -5,7 +5,7 @@ namespace kvaaas {
 KVSRecordsViewer::KVSRecordsViewer(ByteArray *arr, void *compressor)
     : byte_arr(arr), comp(compressor) {}
 
-void KVSRecordsViewer::append(KVSRecord record) {
+std::size_t KVSRecordsViewer::append(const KVSRecord &record) {
   std::uint64_t SIZE = get_value_size(record);
   std::vector<ByteType> record_chars(SIZE); /// TODO make pretty
   std::memcpy(record_chars.data(), &record.key, KEY_SIZE_BYTES);
@@ -17,7 +17,9 @@ void KVSRecordsViewer::append(KVSRecord record) {
                   sizeof(record.value_size),
               record.value.data(), record.value_size);
 
+  auto rec = byte_arr->size();
   byte_arr->append(record_chars);
+  return rec;
 }
 
 KVSRecord KVSRecordsViewer::read_record(uint64_t offset) {
