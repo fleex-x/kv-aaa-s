@@ -72,9 +72,7 @@ void FileByteArray::rewrite(std::size_t begin,
 }
 
 void FileByteArray::append(const ByteType *bytes, std::size_t n) {
-  data.seekp(0);
   data.write(reinterpret_cast<const char *>(bytes), n);
-  data.seekp(0, std::fstream::end);
 }
 
 ByteType *FileByteArray::read_ptr(std::size_t l, std::size_t r) {

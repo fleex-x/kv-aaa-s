@@ -31,7 +31,7 @@ ByteType *gen_random_ptr(int n) {
   std::mt19937_64 rnd(rd());
   std::uniform_int_distribution<unsigned char> dist;
 
-  for (int i =0; i < n; i++) {
+  for (int i = 0; i < n; i++) {
     ptr[i] = static_cast<std::byte>(dist(rnd));
   }
 
@@ -155,7 +155,7 @@ TEST_CASE("Multiple append, but char*") {
     offset += 1000;
   }
 }
-/*
+
 TEST_CASE("Multiple append, but different offsets and char*") {
   FileByteArray arr("fileArray", true);
   std::vector<ByteType *> bArrs(100);
@@ -175,7 +175,7 @@ TEST_CASE("Multiple append, but different offsets and char*") {
   std::uint64_t offset = 0;
   for (std::size_t i = 0; i < bArrs.size(); i++) {
     auto ptr = arr.read_ptr(offset, offset + sizes[i]);
-    for (int j = 0; j < sizes[i]; j++){
+    for (int j = 0; j < sizes[i]; j++) {
       CHECK(ptr[j] == bArrs[i][j]);
     }
     offset += sizes[i];
@@ -208,6 +208,7 @@ TEST_CASE("Rewrite, but char*") {
   arr.rewrite(l, changedArr, r - l);
   CHECK(arr.size() == 2'000'000);
 
+  ptr = arr.read_ptr(0, 2'000'000);
   for (std::size_t j = 0; j < 2'000'000; j++) {
     CHECK(startArr[j] == ptr[j]);
   }
@@ -224,4 +225,3 @@ TEST_CASE("Size, but char*") {
   arr.append(testArr, 10000);
   CHECK(arr.size() == 20000);
 }
- */
