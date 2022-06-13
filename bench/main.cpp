@@ -24,7 +24,7 @@ auto gen_key = [] {
 };
 
 auto gen_value = [] {
-  ValueType val(unsigned(gen_byte()) + 1);
+  ValueType val(2048u);
   for (auto &bt : val) {
     bt = gen_byte();
   }
