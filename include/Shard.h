@@ -105,8 +105,7 @@ struct Shard {
   }
 
   ~Shard() {
-      push_to_skip_list();
-      push_to_sst_from_skip_list();
+      launch_push_process();
   }
 
 private:
@@ -121,24 +120,20 @@ private:
     push_to_skip_list();
     push_to_sst_from_skip_list();
     auto new_kvs_bytes = manager->start_overwrite(MemoryPurpose::KVS);
-    auto new_sst_bytes = manager->start_overwrite(MemoryPurpose::SST);
 
     stat.total = sst.value().size();
     stat.bad = 0;
     KVSRecordsViewer new_kvs(new_kvs_bytes, nullptr);
-    SSTRecordViewer new_sst_viewer(new_sst_bytes, NewSSTRV());
     std::size_t cur_pos = 0;
     for (auto it = sst->begin(); it != sst->end(); ++it, ++cur_pos) {
       const SSTRecord &cur_record = *it;
       ValueType cur_value = kvs_viewer->read_record(cur_record.offset).value;
       std::uint64_t new_offset = new_kvs.append(
           KVSRecord{(*it).key, std::byte(0), cur_value.size(), cur_value});
-      new_sst_viewer.append(SSTRecord{(*it).key, new_offset});
+      sst.value().change_offset(cur_pos, new_offset);
     }
 
-    sst.emplace(new_sst_viewer);
     kvs_viewer.emplace(new_kvs_bytes, nullptr);
-    manager->end_overwrite(MemoryPurpose::SST);
     manager->end_overwrite(MemoryPurpose::KVS);
     operations_since_last_rebuild = 0;
   }
