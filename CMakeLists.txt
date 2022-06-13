@@ -43,3 +43,6 @@ add_executable(SkipListTest tests/doctest_main.cpp tests/skip_list_tests.cpp tes
 #add_executable(KvaaasDISKTest tests/doctest_main.cpp tests/doctest.h tests/KvaaasDISK_test.cpp ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 #target_compile_options(KvaaasDISKTest PUBLIC -fsanitize=address -fsanitize=undefined)
 #target_link_options(KvaaasDISKTest PUBLIC -fsanitize=address -fsanitize=undefined)
+
+
+add_executable(bench bench/main.cpp ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
