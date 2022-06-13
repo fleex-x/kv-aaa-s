@@ -34,7 +34,7 @@ public:
 
 class FileByteArray final : public ByteArray {
 public:
-  explicit FileByteArray(const std::string &s, bool withRAII = false);
+  explicit FileByteArray(const std::string &s, bool withRAII = true);
 
   void append(const std::vector<ByteType> &bytes) override;
 
