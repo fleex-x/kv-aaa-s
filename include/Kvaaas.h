@@ -15,6 +15,8 @@ struct KvaaasOption {
     const std::size_t shard_cnt;
 };
 
+KvaaasOption DefaultOnDisk = {true, ManagerType::FileMM, 100, 1'000, 10'000, .5, 4};
+
 class ShardContainer {
 private:
     std::size_t size;

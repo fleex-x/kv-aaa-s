@@ -41,7 +41,7 @@ struct Shard {
         manager = std::make_unique<FileMemoryManager>(root);
       } else {
         manager = std::make_unique<FileMemoryManager>(
-            FileMemoryManager::from_dir(root));
+            FileMemoryManager::from_dir(this->root));
       }
     } else {
       // TODO maybe process somehow better ?
