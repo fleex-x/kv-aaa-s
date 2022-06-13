@@ -49,7 +49,7 @@ struct SSTRecordViewer {
 
   void change_offset(std::size_t index, std::uint64_t new_offset) {
     const std::size_t REC_SIZE = KEY_SIZE_BYTES + sizeof(std::uint64_t);
-    std::vector<ByteType> vec(4);
+    std::vector<ByteType> vec(sizeof(std::uint64_t));
     std::memcpy(vec.data(), &new_offset, sizeof(std::uint64_t));
     _data->rewrite(REC_SIZE * index + KEY_SIZE_BYTES, vec);
   }
@@ -134,7 +134,7 @@ struct SST {
     return rec.key == key;
   }
 
-  size_t find_offset(const KeyType &key) {
+  std::uint64_t find_offset(const KeyType &key) {
     // find record
     std::int64_t left = 0;                 // less or equal
     std::int64_t right = _rec_view.size(); // not valid
@@ -198,6 +198,10 @@ struct SST {
       }
     }
     _rec_view.change_offset(left, new_offset);
+  }
+
+  void change_offset(std::size_t idx, std::uint64_t new_offset) {
+    _rec_view.change_offset(idx, new_offset);
   }
 
 private:
