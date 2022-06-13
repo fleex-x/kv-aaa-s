@@ -77,7 +77,7 @@ TEST_CASE("MergeIntoSST") {
   std::array<KeyType, N> keys{};
   std::array<ValueType, N> values;
   for (std::size_t i = 0; i < N; ++i) {
-    keys[i] = {gen_byte(), gen_byte(), gen_byte()};
+    keys[i] = gen_key();
     values[i] = ValueType(100, gen_byte());
     shard.add(keys[i], values[i]);
   }
@@ -93,7 +93,7 @@ TEST_CASE("Remove") {
   std::array<KeyType, N> keys{};
   std::array<ValueType, N> values;
   for (std::size_t i = 0; i < N; ++i) {
-    keys[i] = {gen_byte(), gen_byte(), gen_byte()};
+    keys[i] = gen_key();
     values[i] = ValueType(100, gen_byte());
     shard.add(keys[i], values[i]);
   }
