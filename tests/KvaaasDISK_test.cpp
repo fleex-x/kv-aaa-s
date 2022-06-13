@@ -38,9 +38,7 @@ auto gen_value = [] {
   return val;
 };
 
-TEST_CASE("Just Creates") {
-  Kvaaas kvaaas("kvaaas_test", little_on_disk);
-}
+TEST_CASE("Just Creates") { Kvaaas kvaaas("kvaaas_test", little_on_disk); }
 
 TEST_CASE("In-Log put/get") {
   Kvaaas kvaaas("kvaaas_test", little_on_disk);
@@ -91,14 +89,13 @@ TEST_CASE("MergeIntoSST") {
   }
 }
 
-
 TEST_CASE("Remove") {
   Kvaaas kvaaas("kvaaas_test", little_on_disk);
   const std::size_t N = 1200;
   std::array<KeyType, N> keys{};
   std::array<ValueType, N> values;
   for (std::size_t i = 0; i < N; ++i) {
-    keys[i] =gen_key();
+    keys[i] = gen_key();
     values[i] = ValueType(100, gen_byte());
     kvaaas.add(keys[i], values[i]);
   }
