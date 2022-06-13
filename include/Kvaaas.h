@@ -68,6 +68,10 @@ public:
      shards(opt_.shard_cnt),
      root(std::move(root_)),
      opt(opt_) {
+        if (opt.type == ManagerType::FileMM) {
+            std::filesystem::remove_all(root);
+            std::filesystem::create_directory(root);
+        }
         for (std::size_t i = 0; i < opt.shard_cnt; ++i) {
             auto shard_dir = root + "/" + std::to_string(i);
             if (opt.type == ManagerType::FileMM) {
