@@ -187,5 +187,16 @@ TEST_CASE("SSTRecordViewerRebuild") {
   CHECK(view2.get_record(0) == rec);
   CHECK(view2.get_record(1) == rec2);
 }
+TEST_CASE("SST::change offset") {
+  RAMByteArray ba;
+  SSTRecordViewer view(&ba, NewSSTRV{});
+  SSTRecord rec;
+  rec.key = {std::byte(0)};
+  rec.offset = 0;
+  view.append(rec);
+  SST sst(view);
+  sst.change_offset(rec.key, 1);
+  CHECK(sst.find_offset(rec.key) == 1);
+}
 
 } // namespace

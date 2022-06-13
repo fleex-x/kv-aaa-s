@@ -47,6 +47,13 @@ struct SSTRecordViewer {
     return rec;
   }
 
+  void change_offset(std::size_t index, std::uint64_t new_offset) {
+    const std::size_t REC_SIZE = KEY_SIZE_BYTES + sizeof(std::uint64_t);
+    std::vector<ByteType> vec(4);
+    std::memcpy(vec.data(), &new_offset, sizeof(std::uint64_t));
+    _data->rewrite(REC_SIZE * index + KEY_SIZE_BYTES, vec);
+  }
+
   SSTRecordViewer(ByteArrayPtr data, RebuildSSTRV) : _data(data) {}
 
   std::uint64_t size() const noexcept {
@@ -103,6 +110,8 @@ struct SST {
   iterator end() { return iterator(_rec_view, _rec_view.size()); }
 
   std::uint64_t size() const noexcept { return _rec_view.size(); }
+
+  // TODO put bin search in private method or use std::binary_search
 
   bool contains(const KeyType &key) {
     if (!bf.has_key(key)) {
@@ -173,6 +182,22 @@ struct SST {
       viewer.append(*begin2++);
     }
     return SST(viewer);
+  }
+
+  void change_offset(const KeyType &key, std::uint64_t new_offset) {
+    std::int64_t left = 0;                 // less or equal
+    std::int64_t right = _rec_view.size(); // not valid
+
+    while (left + 1 < right) {
+      auto mid = left + (right - left) / 2;
+      auto rec = _rec_view.get_record(mid);
+      if (rec.key <= key) {
+        left = mid;
+      } else {
+        right = mid;
+      }
+    }
+    _rec_view.change_offset(left, new_offset);
   }
 
 private:
