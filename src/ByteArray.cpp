@@ -25,11 +25,11 @@ void RAMByteArray::append(const ByteType *bytes, std::size_t n) {
   byte_array.insert(byte_array.end(), bytes, bytes + n);
 }
 
-ByteType *RAMByteArray::read_ptr(std::size_t l, std::size_t r) {
-  auto *res = byte_array.data();
-  std::memcpy(res, byte_array.data() + l, r - l);
-  return res;
+ByteType *RAMByteArray::read_ptr(ByteType *ptr, std::size_t l, std::size_t r) {
+  std::memcpy(ptr, byte_array.data() + l, r - l);
+  return ptr;
 }
+
 void RAMByteArray::rewrite(std::size_t begin, const ByteType *bytes,
                            std::size_t n) {
   for (std::size_t i = 0; i < n; ++i) {
@@ -75,12 +75,11 @@ void FileByteArray::append(const ByteType *bytes, std::size_t n) {
   data.write(reinterpret_cast<const char *>(bytes), n);
 }
 
-ByteType *FileByteArray::read_ptr(std::size_t l, std::size_t r) {
+ByteType *FileByteArray::read_ptr(ByteType *ptr, std::size_t l, std::size_t r) {
   data.seekp(l);
-  auto *byte_type_ptr = new ByteType[r - l];
-  data.read(reinterpret_cast<char *>(byte_type_ptr), r - l);
+  data.read(reinterpret_cast<char *>(ptr), r - l);
   data.seekp(0, std::fstream::end);
-  return byte_type_ptr;
+  return ptr;
 }
 
 void FileByteArray::rewrite(std::size_t begin, const ByteType *bytes,

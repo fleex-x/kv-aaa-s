@@ -19,7 +19,7 @@ public:
 
   virtual void append(const ByteType *bytes, std::size_t n) = 0;
 
-  virtual ByteType *read_ptr(std::size_t l, std::size_t r) = 0;
+  virtual ByteType *read_ptr(ByteType *ptr, std::size_t l, std::size_t r) = 0;
 
   virtual void rewrite(std::size_t begin, const ByteType *bytes,
                        std::size_t n) = 0;
@@ -40,7 +40,7 @@ public:
 
   void append(const ByteType *bytes, std::size_t n) override;
 
-  ByteType *read_ptr(std::size_t l, std::size_t r) override;
+  ByteType *read_ptr(ByteType *ptr, std::size_t l, std::size_t r) override;
 
   void rewrite(std::size_t begin, const ByteType *bytes,
                std::size_t n) override;
@@ -61,7 +61,7 @@ public:
 
   void append(const ByteType *bytes, std::size_t n) override;
 
-  ByteType *read_ptr(std::size_t l, std::size_t r) override;
+  ByteType *read_ptr(ByteType *ptr, std::size_t l, std::size_t r) override;
 
   void rewrite(std::size_t begin, const ByteType *bytes,
                std::size_t n) override;
