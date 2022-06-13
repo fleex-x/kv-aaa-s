@@ -108,6 +108,11 @@ struct Shard {
     return std::nullopt;
   }
 
+  ~Shard() {
+      push_to_skip_list();
+      push_to_sst_from_skip_list();
+  }
+
 private:
   void do_rebuild() {
     push_to_skip_list();
