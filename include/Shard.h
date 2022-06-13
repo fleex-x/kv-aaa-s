@@ -34,7 +34,7 @@ struct ShardOption {
 
 struct Shard {
   explicit Shard(std::string root, ShardOption opt)
-      : opt(std::move(opt)), root(root) {
+      : opt(std::move(opt)), root(std::move(root)) {
     if (opt.type == ManagerType::FileMM) {
       if (opt.force_create) {
         // it creates empty manifest
