@@ -41,23 +41,26 @@ void SLBottomLevelRecordViewer::set_head(std::uint64_t head) {
 
 SLBottomLevelRecord SLBottomLevelRecordViewer::get_record(std::uint64_t ind) {
   SLBottomLevelRecord record;
-    byte_arr->read_ptr(reinterpret_cast<ByteType *>(&record.next),
-                        get_begin(ind) + SLBottomLevelRecord::NEXT_BEGIN,
-                        get_begin(ind) + SLBottomLevelRecord::NEXT_BEGIN + sizeof(record.next));
+  byte_arr->read_ptr(reinterpret_cast<ByteType *>(&record.next),
+                     get_begin(ind) + SLBottomLevelRecord::NEXT_BEGIN,
+                     get_begin(ind) + SLBottomLevelRecord::NEXT_BEGIN +
+                         sizeof(record.next));
 
-    byte_arr->read_ptr(reinterpret_cast<ByteType *>(&record.offset),
-                       get_begin(ind) + SLBottomLevelRecord::OFFSET_BEGIN,
-                       get_begin(ind) + SLBottomLevelRecord::OFFSET_BEGIN + sizeof(record.offset));
+  byte_arr->read_ptr(reinterpret_cast<ByteType *>(&record.offset),
+                     get_begin(ind) + SLBottomLevelRecord::OFFSET_BEGIN,
+                     get_begin(ind) + SLBottomLevelRecord::OFFSET_BEGIN +
+                         sizeof(record.offset));
 
-    byte_arr->read_ptr(reinterpret_cast<ByteType *>(record.key.data()),
-                       get_begin(ind) + SLBottomLevelRecord::KEY_BEGIN,
-                       get_begin(ind) + SLBottomLevelRecord::KEY_BEGIN + record.key.size());
+  byte_arr->read_ptr(reinterpret_cast<ByteType *>(record.key.data()),
+                     get_begin(ind) + SLBottomLevelRecord::KEY_BEGIN,
+                     get_begin(ind) + SLBottomLevelRecord::KEY_BEGIN +
+                         record.key.size());
   return record;
 }
 
 std::uint64_t SLBottomLevelRecordViewer::get_next(std::uint64_t ind) {
   std::uint64_t next = 0;
-      byte_arr->read_ptr( reinterpret_cast<ByteType *>(&next),
+  byte_arr->read_ptr(reinterpret_cast<ByteType *>(&next),
                      get_begin(ind) + SLBottomLevelRecord::NEXT_BEGIN,
                      get_begin(ind) + SLBottomLevelRecord::NEXT_BEGIN +
                          sizeof(SLBottomLevelRecord::next));
@@ -67,15 +70,14 @@ std::uint64_t SLBottomLevelRecordViewer::get_next(std::uint64_t ind) {
 void SLBottomLevelRecordViewer::set_next(std::uint64_t ind,
                                          std::uint64_t new_next) {
   byte_arr->rewrite(get_begin(ind) + SLBottomLevelRecord::NEXT_BEGIN,
-                    reinterpret_cast<ByteType *>(&new_next),
-                    sizeof(new_next));
+                    reinterpret_cast<ByteType *>(&new_next), sizeof(new_next));
 }
 
 void SLBottomLevelRecordViewer::set_offset(std::uint64_t ind,
                                            std::uint64_t new_offset) {
-    byte_arr->rewrite(get_begin(ind) + SLBottomLevelRecord::OFFSET_BEGIN,
-                      reinterpret_cast<ByteType *>(&new_offset),
-                      sizeof(new_offset));
+  byte_arr->rewrite(get_begin(ind) + SLBottomLevelRecord::OFFSET_BEGIN,
+                    reinterpret_cast<ByteType *>(&new_offset),
+                    sizeof(new_offset));
 }
 
 SLBottomLevelRecord SLBottomLevelRecordViewer::operator[](std::uint64_t ind) {
@@ -84,9 +86,12 @@ SLBottomLevelRecord SLBottomLevelRecordViewer::operator[](std::uint64_t ind) {
 
 std::uint64_t
 SLBottomLevelRecordViewer::append_record(const SLBottomLevelRecord &record) {
-    byte_arr->append(reinterpret_cast<const ByteType *>(&record.next), sizeof(record.next));
-    byte_arr->append(reinterpret_cast<const ByteType *>(&record.offset), sizeof(record.offset));
-    byte_arr->append(reinterpret_cast<const ByteType *>(record.key.data()), KEY_SIZE_BYTES);
+  byte_arr->append(reinterpret_cast<const ByteType *>(&record.next),
+                   sizeof(record.next));
+  byte_arr->append(reinterpret_cast<const ByteType *>(&record.offset),
+                   sizeof(record.offset));
+  byte_arr->append(reinterpret_cast<const ByteType *>(record.key.data()),
+                   KEY_SIZE_BYTES);
   return byte_arr->size() / SLBottomLevelRecord::SIZE - 1;
 }
 
@@ -117,13 +122,15 @@ std::uint64_t SLUpperLevelRecordViewer::get_begin(std::uint64_t ind) {
 
 std::uint64_t SLUpperLevelRecordViewer::get_head(std::uint64_t list_ind) {
   std::uint64_t head = 0;
-  heads->read_ptr(reinterpret_cast<ByteType *>(&head), list_ind * HEAD_SIZE, (list_ind + 1) * HEAD_SIZE);
+  heads->read_ptr(reinterpret_cast<ByteType *>(&head), list_ind * HEAD_SIZE,
+                  (list_ind + 1) * HEAD_SIZE);
   return head;
 }
 
 void SLUpperLevelRecordViewer::set_head(std::uint64_t list_ind,
                                         std::uint64_t head) {
-  heads->rewrite(list_ind * HEAD_SIZE, reinterpret_cast<const ByteType *>(&head), HEAD_SIZE);
+  heads->rewrite(list_ind * HEAD_SIZE,
+                 reinterpret_cast<const ByteType *>(&head), HEAD_SIZE);
 }
 
 void SLUpperLevelRecordViewer::append_head(std::uint64_t head) {
@@ -131,24 +138,28 @@ void SLUpperLevelRecordViewer::append_head(std::uint64_t head) {
 }
 
 SLUpperLevelRecord SLUpperLevelRecordViewer::get_record(std::uint64_t ind) {
-    SLUpperLevelRecord record;
-    byte_arr->read_ptr(reinterpret_cast<ByteType *>(&record.next),
-                       get_begin(ind) + SLUpperLevelRecord::NEXT_BEGIN,
-                       get_begin(ind) + SLUpperLevelRecord::NEXT_BEGIN + sizeof(record.next));
+  SLUpperLevelRecord record;
+  byte_arr->read_ptr(reinterpret_cast<ByteType *>(&record.next),
+                     get_begin(ind) + SLUpperLevelRecord::NEXT_BEGIN,
+                     get_begin(ind) + SLUpperLevelRecord::NEXT_BEGIN +
+                         sizeof(record.next));
 
-    byte_arr->read_ptr(reinterpret_cast<ByteType *>(&record.down),
-                       get_begin(ind) + SLUpperLevelRecord::DOWN_BEGIN,
-                       get_begin(ind) + SLUpperLevelRecord::DOWN_BEGIN + sizeof(record.down));
+  byte_arr->read_ptr(reinterpret_cast<ByteType *>(&record.down),
+                     get_begin(ind) + SLUpperLevelRecord::DOWN_BEGIN,
+                     get_begin(ind) + SLUpperLevelRecord::DOWN_BEGIN +
+                         sizeof(record.down));
 
-    byte_arr->read_ptr(reinterpret_cast<ByteType *>(record.key.data()),
-                       get_begin(ind) + SLUpperLevelRecord::KEY_BEGIN,
-                       get_begin(ind) + SLUpperLevelRecord::KEY_BEGIN + record.key.size());
+  byte_arr->read_ptr(reinterpret_cast<ByteType *>(record.key.data()),
+                     get_begin(ind) + SLUpperLevelRecord::KEY_BEGIN,
+                     get_begin(ind) + SLUpperLevelRecord::KEY_BEGIN +
+                         record.key.size());
   return record;
 }
 
 std::uint64_t SLUpperLevelRecordViewer::get_next(std::uint64_t ind) {
   std::uint64_t next = 0;
-  byte_arr->read_ptr(reinterpret_cast<ByteType *>(&next), get_begin(ind), get_begin(ind) + sizeof(SLUpperLevelRecord::next));
+  byte_arr->read_ptr(reinterpret_cast<ByteType *>(&next), get_begin(ind),
+                     get_begin(ind) + sizeof(SLUpperLevelRecord::next));
   return next;
 }
 
@@ -165,9 +176,12 @@ SLUpperLevelRecord SLUpperLevelRecordViewer::operator[](std::uint64_t ind) {
 
 std::uint64_t
 SLUpperLevelRecordViewer::append_record(const SLUpperLevelRecord &record) {
-  byte_arr->append(reinterpret_cast<const ByteType *>(&record.next), sizeof(record.next));
-  byte_arr->append(reinterpret_cast<const ByteType *>(&record.down), sizeof(record.down));
-  byte_arr->append(reinterpret_cast<const ByteType *>(record.key.data()), KEY_SIZE_BYTES);
+  byte_arr->append(reinterpret_cast<const ByteType *>(&record.next),
+                   sizeof(record.next));
+  byte_arr->append(reinterpret_cast<const ByteType *>(&record.down),
+                   sizeof(record.down));
+  byte_arr->append(reinterpret_cast<const ByteType *>(record.key.data()),
+                   KEY_SIZE_BYTES);
   return byte_arr->size() / SLUpperLevelRecord::SIZE - 1;
 }
 

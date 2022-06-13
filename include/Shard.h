@@ -54,7 +54,7 @@ struct Shard {
     SLUpperLevelRecordViewer sl_upper_viewer(
         manager->get_or_create_byte_array(MemoryPurpose::SKIP_LIST_UL),
         manager->get_or_create_byte_array(MemoryPurpose::SKIP_LIST_UL_H));
-    skip_list.emplace(sl_bottom_viewer, sl_upper_viewer);
+    skip_list.emplace(sl_bottom_viewer, sl_upper_viewer, opt.sl_max_size);
     sst.emplace(SSTRecordViewer(
         manager->get_or_create_byte_array(MemoryPurpose::SST), RebuildSSTRV{}));
   }
@@ -104,16 +104,14 @@ struct Shard {
     return std::nullopt;
   }
 
-  ~Shard() {
-      launch_push_process();
-  }
+  ~Shard() { launch_push_process(); }
 
 private:
   void launch_push_process() {
-      push_to_skip_list();
-      if (skip_list->size() > opt.sl_max_size) {
-          push_to_sst_from_skip_list();
-      }
+    push_to_skip_list();
+    if (skip_list->size() > opt.sl_max_size) {
+      push_to_sst_from_skip_list();
+    }
   }
 
   void do_rebuild() {
@@ -158,7 +156,7 @@ private:
     auto sl_upper_viewer = SLUpperLevelRecordViewer(sl_u, sl_u_h);
     auto sl_bottom_viewer = SLBottomLevelRecordViewer(sl_b);
 
-    skip_list.emplace(sl_bottom_viewer, sl_upper_viewer);
+    skip_list.emplace(sl_bottom_viewer, sl_upper_viewer, opt.sl_max_size);
 
     manager->end_overwrite(MemoryPurpose::SKIP_LIST_UL);
     manager->end_overwrite(MemoryPurpose::SKIP_LIST_UL_H);

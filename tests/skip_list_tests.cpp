@@ -10,6 +10,10 @@
 
 using namespace kvaaas;
 
+namespace {
+
+constexpr std::uint64_t SKIP_LIST_ESTIMATED_SIZE = 1000;
+
 TEST_CASE("SLBottomLevelRecordViewer tests") {
   FileByteArray arr("SkipListFile", true);
   SLBottomLevelRecordViewer viewer(&arr);
@@ -132,7 +136,7 @@ TEST_CASE("SkipList tests simple") {
   RAMByteArray upper;
   SLBottomLevelRecordViewer bottom_viewer(&bottom);
   SLUpperLevelRecordViewer upper_viewer(&upper, &heads);
-  SkipList skip_list(bottom_viewer, upper_viewer);
+  SkipList skip_list(bottom_viewer, upper_viewer, SKIP_LIST_ESTIMATED_SIZE);
   auto one = std::byte(1);
   auto two = std::byte(2);
   auto three = std::byte(3);
@@ -176,7 +180,7 @@ TEST_CASE("SkipList stress-tests") {
   RAMByteArray upper;
   SLBottomLevelRecordViewer bottom_viewer(&bottom);
   SLUpperLevelRecordViewer upper_viewer(&upper, &heads);
-  SkipList skip_list(bottom_viewer, upper_viewer);
+  SkipList skip_list(bottom_viewer, upper_viewer, SKIP_LIST_ESTIMATED_SIZE);
 
   std::random_device rnd_device;
   std::mt19937 mersenne_engine{rnd_device()}; // Generates random integers
@@ -214,7 +218,7 @@ TEST_CASE("Multiple assignment SkipList") {
   RAMByteArray upper;
   SLBottomLevelRecordViewer bottom_viewer(&bottom);
   SLUpperLevelRecordViewer upper_viewer(&upper, &heads);
-  SkipList skip_list(bottom_viewer, upper_viewer);
+  SkipList skip_list(bottom_viewer, upper_viewer, SKIP_LIST_ESTIMATED_SIZE);
 
   KeyType key1{std::byte(1)};
   KeyType key2{std::byte(2)};
@@ -305,7 +309,7 @@ TEST_CASE("SkipList with map stress-tests") {
   RAMByteArray upper;
   SLBottomLevelRecordViewer bottom_viewer(&bottom);
   SLUpperLevelRecordViewer upper_viewer(&upper, &heads);
-  SkipList skip_list(bottom_viewer, upper_viewer);
+  SkipList skip_list(bottom_viewer, upper_viewer, SKIP_LIST_ESTIMATED_SIZE);
 
   std::map<KeyType, std::uint64_t> map;
 
@@ -358,3 +362,5 @@ TEST_CASE("SkipList with map stress-tests") {
     }
   }
 }
+
+} // namespace
