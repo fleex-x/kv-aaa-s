@@ -1,4 +1,5 @@
 #include "Kvaaas.h"
+#include <algorithm>
 #include <chrono>
 #include <filesystem>
 #include <iostream>
@@ -68,22 +69,22 @@ stat collect_stat(const unsigned already, const unsigned total,
   Nanoseconds max_per_read = Nanoseconds::min();
   for (std::size_t i = 0; i < total; ++i) {
     int type = disc_dist(mersenne_engine);
+    KeyType key = i % 2 == 0? *std::next(keys_already_in.begin(), mersenne_engine() % already) : gen_key();
     if (type == 0) { // reading
       ++cnt_read;
       TimePoint begin = Now();
-      // TODO not random ???
-      kvs.get(gen_key());
+      kvs.get(key);
       TimePoint end = Now();
       sum_read += end - begin;
-      max_per_read = std::max(max_per_read, end - begin);
+      max_per_read = std::max<Nanoseconds>(max_per_read, end - begin);
     } else if (type == 1) { // writing
       ++cnt_write;
       TimePoint begin = Now();
       // TODO not random ???
-      kvs.get(gen_key());
+      kvs.add(key, gen_value());
       TimePoint end = Now();
       sum_write += end - begin;
-      max_per_write = std::max(max_per_write, end - begin);
+      max_per_write = std::max<Nanoseconds>(max_per_write, end - begin);
     }
   }
   return {(sum_read + sum_write) / total, sum_write / cnt_write,
@@ -100,26 +101,26 @@ int main(const int argc, const char **argv) {
     return 1;
   }
   const unsigned ALREADY_IN = [argv]() {
-    unsigned t = -1;
+    unsigned t = 1;
     sscanf(argv[1], "%u", &t);
     return t;
   }();
   const unsigned TOTAL_QUERIES = [argv]() {
-    unsigned t = -1;
+    unsigned t = 1;
     sscanf(argv[2], "%u", &t);
     return t;
   }();
   const unsigned READ_PERCENT = [argv]() {
-    unsigned t = -1;
+    unsigned t = 1;
     sscanf(argv[3], "%u", &t);
     assert(t <= 100);
     return t;
   }();
 
   auto st = collect_stat(ALREADY_IN, TOTAL_QUERIES, READ_PERCENT);
-  std::cout << "time per requens (ns): " << st.time_per_request.count() << "\n" << 
-               "time per write (ns): " << st.time_per_write.count() << '\n' << 
-               "time per read (ns): " << st.time_per_read.count() << '\n' << 
+  std::cout << "avg per request (ns): " << st.time_per_request.count() << "\n" << 
+               "avg per write (ns): " << st.time_per_write.count() << '\n' << 
+               "avg per read (ns): " << st.time_per_read.count() << '\n' << 
                "max per write (ns): " << st.max_per_write.count() << '\n' << 
-               "min per read (ns): " << st.max_per_read.count() << '\n' << std::endl;
+               "max per read (ns): " << st.max_per_read.count() << '\n' << std::endl;
 }
