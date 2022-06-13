@@ -33,8 +33,8 @@ struct ShardOption {
 // Better to add logic of choosing memory manager etc to private function
 
 struct Shard {
-  explicit Shard(std::string root, ShardOption opt)
-      : opt(std::move(opt)), root(std::move(root)) {
+  explicit Shard(std::string root_, ShardOption opt)
+      : opt(std::move(opt)), root(std::move(root_)) {
     if (opt.type == ManagerType::FileMM) {
       if (opt.force_create) {
         // it creates empty manifest
@@ -76,11 +76,7 @@ struct Shard {
     log.add(key, offset);
 
     if (log.size() > opt.log_max_size) {
-      push_to_skip_list();
-    }
-
-    if (skip_list->size() > opt.sl_max_size) {
-      push_to_sst_from_skip_list();
+      launch_push_process();
     }
 
     if (is_time_to_rebuild()) {
@@ -114,6 +110,13 @@ struct Shard {
   }
 
 private:
+  void launch_push_process() {
+      push_to_skip_list();
+      if (skip_list->size() > opt.sl_max_size) {
+          push_to_sst_from_skip_list();
+      }
+  }
+
   void do_rebuild() {
     push_to_skip_list();
     push_to_sst_from_skip_list();
