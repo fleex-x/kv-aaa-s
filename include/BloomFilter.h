@@ -12,7 +12,7 @@ struct defer {};
 class BloomFilter {
 public:
   explicit BloomFilter(std::size_t elements_cnt)
-      : _function_cnt(std::max(std::size_t(3), std::__lg(elements_cnt) + 1)),
+      : _function_cnt(std::max(std::size_t(3), elements_cnt + 1)),
         _seeds(_function_cnt), _data(std::max(std::size_t(10), elements_cnt)) {
     std::random_device rd;
     std::mt19937 rng(rd());
