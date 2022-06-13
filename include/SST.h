@@ -62,7 +62,7 @@ private:
 struct SST {
 
   explicit SST(SSTRecordViewer rec_viewer)
-      : _rec_view(std::move(rec_viewer)), bf(_rec_view.size()) {
+      : _rec_view(std::move(rec_viewer)), bf(_rec_view.size() + 10) {
     for (std::size_t i = 0; i < _rec_view.size(); ++i) {
       bf.add(rec_viewer.get_record(i).key);
     }
