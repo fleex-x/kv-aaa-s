@@ -17,11 +17,11 @@ ShardOption little_in_ram{
 };
 
 ShardOption big_in_ram{
-        true, ManagerType::RAMMM,
-        1000,    // log max size
-        5000,    // skip list max size
-        100000, // sst max size
-        0.5,
+    true,   ManagerType::RAMMM,
+    1000,   // log max size
+    5000,   // skip list max size
+    100000, // sst max size
+    0.5,
 };
 std::random_device rnd_device;
 std::mt19937 mersenne_engine{rnd_device()}; // Generates random integers

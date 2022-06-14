@@ -22,13 +22,17 @@ std::size_t KVSRecordsViewer::append(const KVSRecord &record) {
   return rec;
 }
 
-std::uint64_t KVSRecordsViewer::append_not_deleted_record(const KeyType &key, const ValueType &value) {
+std::uint64_t
+KVSRecordsViewer::append_not_deleted_record(const KeyType &key,
+                                            const ValueType &value) {
   auto res = byte_arr->size();
   static const ByteType not_deleted{0};
   std::uint64_t value_size = value.size();
   byte_arr->append(key.data(), KEY_SIZE_BYTES);
-  byte_arr->append(reinterpret_cast<const ByteType *>(&not_deleted), sizeof(not_deleted));
-  byte_arr->append(reinterpret_cast<const ByteType *>(&value_size), sizeof(value_size));
+  byte_arr->append(reinterpret_cast<const ByteType *>(&not_deleted),
+                   sizeof(not_deleted));
+  byte_arr->append(reinterpret_cast<const ByteType *>(&value_size),
+                   sizeof(value_size));
   byte_arr->append(value);
   return res;
 }

@@ -17,14 +17,14 @@ KvaaasOption little_on_disk{
     3 // kvaaas_cnt
 };
 
-    KvaaasOption big_on_disk{
-            true, ManagerType::FileMM,
-            1000,    // log max size
-            5000,    // skip list max size
-            100000, // sst max size
-            0.5,
-            10 // kvaaas_cnt
-    };
+KvaaasOption big_on_disk{
+    true,   ManagerType::FileMM,
+    1000,   // log max size
+    5000,   // skip list max size
+    100000, // sst max size
+    0.5,
+    10 // kvaaas_cnt
+};
 std::random_device rnd_device;
 std::mt19937 mersenne_engine{rnd_device()}; // Generates random integers
 std::uniform_int_distribution<unsigned> dist{

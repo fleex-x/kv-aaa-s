@@ -24,7 +24,8 @@ public:
   KVSRecordsViewer(ByteArray *arr, void *compressor);
 
   /* Expect<offset, status>*/ std::size_t append(const KVSRecord &record);
-  std::uint64_t append_not_deleted_record(const KeyType &key, const ValueType &value);
+  std::uint64_t append_not_deleted_record(const KeyType &key,
+                                          const ValueType &value);
 
   static std::uint64_t get_value_size(const KVSRecord &record);
 
