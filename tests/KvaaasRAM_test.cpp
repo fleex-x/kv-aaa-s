@@ -216,7 +216,7 @@ TEST_CASE("Kvaaas with map stress-tests") {
     put_new_key();
   }
 
-  static constexpr std::size_t UWU2 = 10000;
+  static constexpr std::size_t UWU2 = 1000;
 
   for (std::size_t i = 0; i < UWU2; ++i) {
     switch (dist(mersenne_engine)) {

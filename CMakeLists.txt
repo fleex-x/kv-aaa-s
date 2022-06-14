@@ -46,3 +46,4 @@ add_executable(SkipListTest tests/doctest_main.cpp tests/skip_list_tests.cpp tes
 
 
 add_executable(bench bench/main.cpp ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
+add_executable(end2end end2endtest/main.cpp ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
