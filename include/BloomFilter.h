@@ -41,7 +41,7 @@ private:
   static constexpr std::size_t C = 6;
   std::size_t lg(std::size_t x) {
       std::size_t res = 0;
-      while (x > (1 << res)) {
+      while (x > (std::size_t(1) << res)) {
           ++res;
       }
       return res;
