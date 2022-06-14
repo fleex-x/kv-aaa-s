@@ -5,12 +5,14 @@
 #include <iostream>
 #include <random>
 #include <set>
+#include <fstream> 
+#include "json.hpp"
 
 namespace {
 using namespace kvaaas;
 
 std::random_device rnd_device;
-std::mt19937 mersenne_engine{rnd_device()}; // Generates random integers
+std::mt19937 mersenne_engine{rnd_device()}; 
 std::uniform_int_distribution<unsigned> dist{
     1, static_cast<unsigned>(std::numeric_limits<std::byte>::max())};
 
@@ -80,7 +82,6 @@ stat collect_stat(const unsigned already, const unsigned total,
     } else if (type == 1) { // writing
       ++cnt_write;
       TimePoint begin = Now();
-      // TODO not random ???
       kvs.add(key, gen_value());
       TimePoint end = Now();
       sum_write += end - begin;
@@ -93,9 +94,9 @@ stat collect_stat(const unsigned already, const unsigned total,
 
 } // namespace
 
-// usage: %progmram% ALREADY_IN TOTAL_QUERIES READ_PERCENT
+// usage: %program% ALREADY_IN TOTAL_QUERIES READ_PERCENT OUTPUT_FILE
 int main(const int argc, const char **argv) {
-  if (argc < 4) {
+  if (argc < 5) {
     std::cout << "Usage: %program% ALREADY_IN TOTAL_QUERIES READ_PERCENT"
               << std::endl;
     return 1;
@@ -117,10 +118,17 @@ int main(const int argc, const char **argv) {
     return t;
   }();
 
-  auto st = collect_stat(ALREADY_IN, TOTAL_QUERIES, READ_PERCENT);
-  std::cout << "avg per request (ns): " << st.time_per_request.count() << "\n" << 
-               "avg per write (ns): " << st.time_per_write.count() << '\n' << 
-               "avg per read (ns): " << st.time_per_read.count() << '\n' << 
-               "max per write (ns): " << st.max_per_write.count() << '\n' << 
-               "max per read (ns): " << st.max_per_read.count() << '\n' << std::endl;
+  auto stat = collect_stat(ALREADY_IN, TOTAL_QUERIES, READ_PERCENT);
+
+  std::ofstream out(argv[4]);
+  nlohmann::json json;
+  json["already_in"] = ALREADY_IN;
+  json["total_queries"] = TOTAL_QUERIES;
+  json["read_percent"] = READ_PERCENT;
+  json["avg_per_request"] = stat.time_per_request.count();
+  json["avg_per_write"] = stat.time_per_write.count();
+  json["max_per_write"] = stat.max_per_write.count();
+  json["avg_per_read"] = stat.time_per_read.count();
+  json["max_per_read"] = stat.max_per_read.count();
+  out << json;
 }
