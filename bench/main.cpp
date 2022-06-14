@@ -81,8 +81,9 @@ stat collect_stat(const unsigned already, const unsigned total,
       max_per_read = std::max<Nanoseconds>(max_per_read, end - begin);
     } else if (type == 1) { // writing
       ++cnt_write;
+      auto value = gen_value();
       TimePoint begin = Now();
-      kvs.add(key, gen_value());
+      kvs.add(key, value);
       TimePoint end = Now();
       sum_write += end - begin;
       max_per_write = std::max<Nanoseconds>(max_per_write, end - begin);
