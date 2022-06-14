@@ -191,9 +191,10 @@ private:
   };
   RebuildStat stat{};
   std::size_t operations_since_last_rebuild = 0;
-  static const std::size_t MIN_NUMBER_OF_OP_TO_REBUILD = 2;
+  static const std::size_t MIN_NUMBER_OF_OP_TO_REBUILD = 100;
 
   bool is_time_to_rebuild() const {
+    return false;
     return stat.total > 0 &&
            operations_since_last_rebuild >= MIN_NUMBER_OF_OP_TO_REBUILD &&
            static_cast<double>(stat.bad) > static_cast<double>(opt.busy_coeff) *

@@ -12,17 +12,16 @@ int main(const int argc, const char **argv) {
         return 1;
     }
 
-    KvaaasOption little_in_ram_kvaaas{
-            true, ManagerType::RAMMM,
+    KvaaasOption little_on_disk{
+            true, ManagerType::FileMM,
             2,    // log max size
-            2,    // skip list max size
+            4,    // skip list max size
             2000, // sst max size
             0.5,
             3 // kvaaas_cnt
     };
 
-    Kvaaas kvs("end2end-dir", little_in_ram_kvaaas);
-    kvs.add(KeyType{std::byte(1)}, ValueType{std::byte(1)});
+    Kvaaas kvs("end2end-dir", little_on_disk);
     std::size_t cnt_queries;
     std::ifstream in(argv[1]);
     std::ifstream expected_answers(argv[2]);
@@ -79,7 +78,7 @@ int main(const int argc, const char **argv) {
             expected_answers >> expected_value_s;
             if (value_s != expected_value_s) {
                 is_ok = false;
-                std::cout << i + 1 << " test failed(" << cnt_get_queries << " GET query): key is " << key_s << "\n\t expected: " << expected_value_s << "\n\t  but got: " << value_s << std::endl;
+                std::cout << i + 1 << " test failed (" << cnt_get_queries << " GET query): key is " << key_s << "\n\t expected: " << expected_value_s << "\n\t  but got: " << value_s << std::endl;
             }
         }
     }
