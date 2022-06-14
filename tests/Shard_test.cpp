@@ -15,6 +15,14 @@ ShardOption little_in_ram{
     2000, // sst max size
     0.5,
 };
+
+ShardOption big_in_ram{
+        true, ManagerType::RAMMM,
+        1000,    // log max size
+        5000,    // skip list max size
+        100000, // sst max size
+        0.5,
+};
 std::random_device rnd_device;
 std::mt19937 mersenne_engine{rnd_device()}; // Generates random integers
 std::uniform_int_distribution<unsigned> dist{
@@ -180,7 +188,7 @@ TEST_CASE("Shard with map stress-tests") {
       rnd_device()}; // Generates random integers
   static std::uniform_int_distribution<std::uint64_t> dist{0, 3};
 
-  Shard shard("shard_test", little_in_ram);
+  Shard shard("shard_test", big_in_ram);
 
   std::map<KeyType, ValueType> map;
 

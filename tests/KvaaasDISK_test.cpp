@@ -16,6 +16,15 @@ KvaaasOption little_on_disk{
     0.5,
     3 // kvaaas_cnt
 };
+
+    KvaaasOption big_on_disk{
+            true, ManagerType::FileMM,
+            1000,    // log max size
+            5000,    // skip list max size
+            100000, // sst max size
+            0.5,
+            10 // kvaaas_cnt
+    };
 std::random_device rnd_device;
 std::mt19937 mersenne_engine{rnd_device()}; // Generates random integers
 std::uniform_int_distribution<unsigned> dist{
@@ -182,7 +191,7 @@ TEST_CASE("Kvaaas with map stress-tests") {
       rnd_device()}; // Generates random integers
   static std::uniform_int_distribution<std::uint64_t> dist{0, 3};
 
-  Kvaaas kvaaas("kvaaas_test", little_on_disk);
+  Kvaaas kvaaas("kvaaas_test", big_on_disk);
 
   std::map<KeyType, ValueType> map;
 
@@ -214,7 +223,7 @@ TEST_CASE("Kvaaas with map stress-tests") {
     put_new_key();
   }
 
-  static constexpr std::size_t UWU2 = 1000;
+  static constexpr std::size_t UWU2 = 10000;
 
   for (std::size_t i = 0; i < UWU2; ++i) {
     switch (dist(mersenne_engine)) {
