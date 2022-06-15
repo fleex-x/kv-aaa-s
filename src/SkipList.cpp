@@ -5,8 +5,10 @@
 namespace kvaaas {
 
 SkipList::SkipList(const SLBottomLevelRecordViewer &bottom_,
-                   const SLUpperLevelRecordViewer &upper_)
-    : bottom(bottom_), upper(upper_), levels_count(1 + upper.get_levels()) {}
+                   const SLUpperLevelRecordViewer &upper_,
+                   std::uint64_t estimated_size)
+    : bottom(bottom_), upper(upper_), levels_count(1 + upper.get_levels()),
+      filter(estimated_size) {}
 
 std::uint64_t
 SkipList::insert_after_on_upper_level(std::uint64_t ind,
@@ -78,6 +80,7 @@ void SkipList::insert_after_parents(const std::vector<std::uint64_t> &parents,
 }
 
 void SkipList::put(const KeyType &key, std::uint64_t offset) {
+  filter.add(key);
   if (!bottom.has_head()) {
     SLBottomLevelRecord new_record(key, offset);
     insert_as_head_bottom_level(new_record);
@@ -133,6 +136,9 @@ void SkipList::put(const KeyType &key, std::uint64_t offset) {
 }
 
 std::optional<std::uint64_t> SkipList::find(const KeyType &key) {
+  if (!filter.has_key(key)) {
+    return {};
+  }
   if (!bottom.has_head()) {
     return {};
   }

@@ -1,0 +1,22 @@
+21
+GET key1
+ADD key1 value1
+GET key1
+REMOVE key1
+GET key1
+ADD key1 value2
+GET key1
+REMOVE key1
+GET key1
+ADD key1 value3
+GET key1
+REMOVE key1
+GET key1
+ADD key1 value4
+GET key1
+REMOVE key1
+GET key1
+ADD key1 value5
+GET key1
+REMOVE key1
+GET key1

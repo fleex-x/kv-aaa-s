@@ -47,6 +47,13 @@ struct SSTRecordViewer {
     return rec;
   }
 
+  void change_offset(std::size_t index, std::uint64_t new_offset) {
+    const std::size_t REC_SIZE = KEY_SIZE_BYTES + sizeof(std::uint64_t);
+    std::vector<ByteType> vec(sizeof(std::uint64_t));
+    std::memcpy(vec.data(), &new_offset, sizeof(std::uint64_t));
+    _data->rewrite(REC_SIZE * index + KEY_SIZE_BYTES, vec);
+  }
+
   SSTRecordViewer(ByteArrayPtr data, RebuildSSTRV) : _data(data) {}
 
   std::uint64_t size() const noexcept {
@@ -62,7 +69,7 @@ private:
 struct SST {
 
   explicit SST(SSTRecordViewer rec_viewer)
-      : _rec_view(std::move(rec_viewer)), bf(_rec_view.size()) {
+      : _rec_view(std::move(rec_viewer)), bf(_rec_view.size() + 10) {
     for (std::size_t i = 0; i < _rec_view.size(); ++i) {
       bf.add(rec_viewer.get_record(i).key);
     }
@@ -104,6 +111,8 @@ struct SST {
 
   std::uint64_t size() const noexcept { return _rec_view.size(); }
 
+  // TODO put bin search in private method or use std::binary_search
+
   bool contains(const KeyType &key) {
     if (!bf.has_key(key)) {
       return false;
@@ -125,7 +134,7 @@ struct SST {
     return rec.key == key;
   }
 
-  size_t find_offset(const KeyType &key) {
+  std::uint64_t find_offset(const KeyType &key) {
     // find record
     std::int64_t left = 0;                 // less or equal
     std::int64_t right = _rec_view.size(); // not valid
@@ -173,6 +182,26 @@ struct SST {
       viewer.append(*begin2++);
     }
     return SST(viewer);
+  }
+
+  void change_offset(const KeyType &key, std::uint64_t new_offset) {
+    std::int64_t left = 0;                 // less or equal
+    std::int64_t right = _rec_view.size(); // not valid
+
+    while (left + 1 < right) {
+      auto mid = left + (right - left) / 2;
+      auto rec = _rec_view.get_record(mid);
+      if (rec.key <= key) {
+        left = mid;
+      } else {
+        right = mid;
+      }
+    }
+    _rec_view.change_offset(left, new_offset);
+  }
+
+  void change_offset(std::size_t idx, std::uint64_t new_offset) {
+    _rec_view.change_offset(idx, new_offset);
   }
 
 private:

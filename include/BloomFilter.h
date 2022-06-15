@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "xxhash.h"
+#include <algorithm>
 #include <random>
 #include <vector>
 
@@ -10,8 +11,10 @@ namespace kvaaas {
 struct defer {};
 class BloomFilter {
 public:
-  explicit BloomFilter(std::size_t elements_cnt, std::size_t function_cnt = 5)
-      : _function_cnt(function_cnt), _seeds(function_cnt), _data(elements_cnt) {
+  explicit BloomFilter(std::size_t elements_cnt)
+      : _function_cnt(std::max(std::size_t(3), lg(elements_cnt) + 1)),
+        _seeds(_function_cnt),
+        _data(std::max(std::size_t(10), elements_cnt * C)) {
     std::random_device rd;
     std::mt19937 rng(rd());
     std::uniform_int_distribution<std::mt19937::result_type> dist(0,
@@ -24,7 +27,7 @@ public:
   bool has_key(const KeyType &key) {
     bool has = true;
     for (std::size_t i = 0; i < _function_cnt; ++i) {
-      has &= _data[hashAt(key, i)];
+      has = has && _data[hashAt(key, i)];
     }
     return has;
   }
@@ -36,6 +39,14 @@ public:
   }
 
 private:
+  static constexpr std::size_t C = 6;
+  std::size_t lg(std::size_t x) {
+    std::size_t res = 0;
+    while (x > (std::size_t(1) << res)) {
+      ++res;
+    }
+    return res;
+  }
   uint32_t hashAt(const KeyType &key, std::size_t index) const noexcept {
     uint32_t current_seed = _seeds[index];
     return XXH32(key.data(), key.size(), current_seed) % _data.size();

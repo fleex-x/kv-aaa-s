@@ -1,4 +1,5 @@
 #pragma once
+#include "BloomFilter.h"
 #include "Core.h"
 #include "SST.h"
 #include "SkipListRecords.h"
@@ -32,9 +33,12 @@ private:
   std::mt19937 rng{0};
   std::uniform_int_distribution<std::mt19937::result_type> dist{0, 1};
 
+  BloomFilter filter;
+
 public:
   SkipList(const SLBottomLevelRecordViewer &bottom_,
-           const SLUpperLevelRecordViewer &upper_);
+           const SLUpperLevelRecordViewer &upper_,
+           std::uint64_t estimated_size);
   void put(const KeyType &key, std::uint64_t offset);
   std::optional<std::uint64_t> find(const KeyType &key);
   bool has_key(const KeyType &key);

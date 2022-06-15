@@ -1,0 +1,16 @@
+15
+GET key1
+ADD key1 1234
+GET key1
+ADD key1 12345
+GET key1
+ADD key2 1235
+ADD key3 12345
+ADD key4 12345
+ADD key4 123456
+GET key4
+REMOVE key4
+GET key4
+GET key3
+REMOVE key3
+GET key3
