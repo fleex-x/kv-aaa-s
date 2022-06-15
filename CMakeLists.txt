@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 file(GLOB zstd_common "libs/zstd/common/*.h" "libs/zstd/common/*.c")
 file(GLOB zstd_compress "libs/zstd/compress/*.h" "libs/zstd/compress/*.c")
-file(GLOB zstd_decompress "libs/zstd/decompress/*.h" "libs/zstd/decompress/*.c" "zstd/decompress/*.S")
+file(GLOB zstd_decompress "libs/zstd/decompress/*.h" "libs/zstd/decompress/*.c" "libs/zstd/decompress/*.S")
 file(GLOB zstd_dict_builder "libs/zstd/dictBuilder/*.h" "libs/zstd/dictBuilder/*.c")
 
 file(GLOB srcs "src/*.cpp")
@@ -20,19 +20,18 @@ set(zstd ${zstd_common} ${zstd_compress} ${zstd_decompress} ${zstd_dict_builder}
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic") # TODO add -Werror
 
-
 include_directories(libs/include)
 include_directories(include)
 
 #add_executable(main main.cpp)
 
-add_executable(test ${tests} ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
+add_executable(test ${zstd} ${tests} ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 
-add_executable(sanitizer-test ${tests} ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
+add_executable(sanitizer-test ${zstd} ${tests} ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 target_compile_options(sanitizer-test PUBLIC -fsanitize=address -fsanitize=undefined)
 target_link_options(sanitizer-test PUBLIC -fsanitize=address -fsanitize=undefined)
 
-add_executable(KVSRecordsTest tests/doctest_main.cpp tests/KVSRecords_test.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
+add_executable(KVSRecordsTest tests/doctest_main.cpp tests/KVSRecords_test.cpp tests/doctest.h ${zstd} ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 add_executable(SkipListTest tests/doctest_main.cpp tests/skip_list_tests.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 add_executable(FileByteArrayTest tests/doctest_main.cpp tests/FileByteArray_tests.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})
 add_executable(SSTTest tests/doctest_main.cpp tests/sst.cpp tests/doctest.h ${srcs} ${headers} ${lib_headers} ${lib_cpp_srcs})

@@ -3,6 +3,7 @@
 #include "Error.h"
 #include <cstdint>
 #include <cstring>
+#include "../libs/zstd/zstd.h"
 
 namespace kvaaas {
 
