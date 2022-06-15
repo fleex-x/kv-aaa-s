@@ -60,8 +60,9 @@ TEST_CASE("Multiple append") {
 
   std::uint64_t offset = 0;
   for (const auto &record : records) {
-    CHECK(record == viewer.read_record(offset));
-    offset += KVSRecordsViewer::get_value_size(record);
+    auto record2 = viewer.read_record(offset);
+    CHECK(record == record2);
+    offset += KVSRecordsViewer::get_value_size(record2);
   }
 }
 
@@ -80,7 +81,8 @@ TEST_CASE("Multiple is_deleted") {
     if (record.is_deleted == std::byte{1}) {
       CHECK(viewer.is_deleted(offset));
     }
-    offset += KVSRecordsViewer::get_value_size(record);
+    auto record2 = viewer.read_record(offset);
+    offset += KVSRecordsViewer::get_value_size(record2);
   }
 }
 

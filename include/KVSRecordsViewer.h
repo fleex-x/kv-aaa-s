@@ -11,6 +11,7 @@ struct KVSRecord {
   KeyType key{};
   ByteType is_deleted{};
   std::uint64_t value_size{};
+  std::uint64_t compressed_size{};
   ValueType value{};
 };
 

@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.0)
 
-project(kv-aaa-s CXX)
+project(kv-aaa-s)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -22,6 +22,8 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic") # TODO add -Werror
 
 include_directories(libs/include)
 include_directories(include)
+
+set_property(SOURCE libs/zstd/decompress/huf_decompress_amd64.S PROPERTY LANGUAGE C)
 
 #add_executable(main main.cpp ${zstd} libs/zstd/zstd.h)
 
