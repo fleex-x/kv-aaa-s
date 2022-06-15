@@ -3,6 +3,7 @@
 #include "Error.h"
 #include <cstdint>
 #include <cstring>
+#include "../libs/zstd/zstd.h"
 
 namespace kvaaas {
 
@@ -10,6 +11,7 @@ struct KVSRecord {
   KeyType key{};
   ByteType is_deleted{};
   std::uint64_t value_size{};
+  std::uint64_t compressed_size = 0;
   ValueType value{};
 };
 

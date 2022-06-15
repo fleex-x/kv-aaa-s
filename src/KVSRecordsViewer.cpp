@@ -6,34 +6,53 @@ KVSRecordsViewer::KVSRecordsViewer(ByteArray *arr, void *compressor)
     : byte_arr(arr), comp(compressor) {}
 
 std::size_t KVSRecordsViewer::append(const KVSRecord &record) {
-  std::uint64_t SIZE = get_value_size(record);
-  std::vector<ByteType> record_chars(SIZE); /// TODO make pretty
-  std::memcpy(record_chars.data(), &record.key, KEY_SIZE_BYTES);
-  std::memcpy(record_chars.data() + KEY_SIZE_BYTES, &record.is_deleted,
-              sizeof(record.is_deleted));
-  std::memcpy(record_chars.data() + KEY_SIZE_BYTES + sizeof(record.is_deleted),
-              &record.value_size, sizeof(record.value_size));
-  std::memcpy(record_chars.data() + KEY_SIZE_BYTES + sizeof(record.is_deleted) +
-                  sizeof(record.value_size),
-              record.value.data(), record.value_size);
+  std::vector<ByteType> compressed(record.value_size * 3 / 2);
+  std::uint64_t size;
+  if (record.value_size < 1000) {
+    size = record.value_size;
+    compressed = record.value;
+  } else {
+    size = ZSTD_compress(compressed.data(), record.value_size * 3 / 2,
+                         record.value.data(), record.value_size, 7);
+  }
 
   auto rec = byte_arr->size();
-  byte_arr->append(record_chars);
+  byte_arr->append(record.key.data(), record.key.size());
+  byte_arr->append(reinterpret_cast<const ByteType *>(&record.is_deleted),
+                   sizeof(record.is_deleted));
+  byte_arr->append(reinterpret_cast<const ByteType *>(&record.value_size),
+                   sizeof(record.value_size));
+  byte_arr->append(reinterpret_cast<const ByteType *>(&size), sizeof(size));
+  byte_arr->append(compressed.data(), size);
   return rec;
 }
 
 std::uint64_t
 KVSRecordsViewer::append_not_deleted_record(const KeyType &key,
                                             const ValueType &value) {
-  auto res = byte_arr->size();
+
   static const ByteType not_deleted{0};
   std::uint64_t value_size = value.size();
+
+  std::vector<ByteType> compressed(value_size * 3 / 2);
+  std::uint64_t size;
+  if (value_size < 1000) {
+    size = value_size;
+    compressed = value;
+  } else {
+    size = ZSTD_compress(compressed.data(), value_size * 3 / 2, value.data(),
+                         value_size, 7);
+  }
+
+  auto res = byte_arr->size();
+
   byte_arr->append(key.data(), KEY_SIZE_BYTES);
   byte_arr->append(reinterpret_cast<const ByteType *>(&not_deleted),
                    sizeof(not_deleted));
   byte_arr->append(reinterpret_cast<const ByteType *>(&value_size),
                    sizeof(value_size));
-  byte_arr->append(value);
+  byte_arr->append(reinterpret_cast<const ByteType *>(&size), sizeof(size));
+  byte_arr->append(compressed.data(), size);
   return res;
 }
 
@@ -56,8 +75,22 @@ KVSRecord KVSRecordsViewer::read_record(uint64_t offset) {
               sizeof(record.value_size));
   offset += sizeof(record.value_size);
 
-  record.value = byte_arr->read(offset, offset + record.value_size);
+  std::vector<ByteType> size_array =
+      byte_arr->read(offset, offset + sizeof(record.compressed_size));
+  std::memcpy(&record.compressed_size, size_array.data(),
+              sizeof(record.compressed_size));
+  offset += sizeof(record.compressed_size);
 
+  std::vector<ByteType> in(record.compressed_size);
+  std::vector<ByteType> out(record.value_size);
+  byte_arr->read_ptr(in.data(), offset, offset + record.compressed_size);
+  if (record.value_size < 1000) {
+    out = in;
+  } else {
+    ZSTD_decompress(out.data(), record.value_size, in.data(),
+                    record.compressed_size);
+  }
+  record.value = std::move(out);
   return record;
 }
 
@@ -73,7 +106,8 @@ bool KVSRecordsViewer::is_deleted(uint64_t offset) {
 
 std::uint64_t KVSRecordsViewer::get_value_size(const KVSRecord &record) {
   return KEY_SIZE_BYTES + sizeof(record.is_deleted) +
-         sizeof(record.value_size) + record.value_size;
+         sizeof(record.value_size) + sizeof(record.compressed_size) +
+         record.compressed_size;
 }
 
 bool operator==(const KVSRecord &record1, const KVSRecord &record2) {
