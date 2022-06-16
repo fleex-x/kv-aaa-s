@@ -11,6 +11,19 @@
 namespace {
 using namespace kvaaas;
 
+KvaaasOption get_kvaaas_option(std::uint64_t expected_elements, double busy_coeff) {
+    return KvaaasOption
+    {
+        true,                    // force_create
+        ManagerType::FileMM,     // memory_type
+        5000,                    // log_max_size
+        expected_elements / 3,   // skip_list_max_size
+        expected_elements,       // sst_max_size
+        busy_coeff,              // busy_coeff
+        10                       // shard_cnt
+    };
+}
+
 std::random_device rnd_device;
 std::mt19937 mersenne_engine{rnd_device()}; 
 std::uniform_int_distribution<unsigned> dist{
@@ -18,17 +31,17 @@ std::uniform_int_distribution<unsigned> dist{
 
 auto gen_byte = []() { return std::byte(dist(mersenne_engine)); };
 auto gen_key = [] {
-  KeyType key;
-  for (std::size_t i = 0; i < key.size(); ++i) {
-    key[i] = gen_byte();
+  KeyType key{};
+  for (auto &byte : key) {
+    byte = gen_byte();
   }
   return key;
 };
 
-auto gen_value = [] {
-  ValueType val(2048u);
-  for (auto &bt : val) {
-    bt = gen_byte();
+auto gen_value = [](const unsigned value_size) {
+  ValueType val(value_size);
+  for (auto &byte : val) {
+    byte = gen_byte();
   }
   return val;
 };
@@ -47,7 +60,8 @@ struct stat {
 };
 
 stat collect_stat(const unsigned already, const unsigned total,
-                  const unsigned read_percent) {
+                  const unsigned read_percent,
+                  const unsigned value_size) {
   // Write "already in" recordings
   std::set<KeyType> keys_already_in;
   while (keys_already_in.size() < already) {
@@ -55,10 +69,10 @@ stat collect_stat(const unsigned already, const unsigned total,
   }
 
   std::filesystem::create_directory("abobus");
-  Kvaaas kvs("abobus", DefaultOnDisk);
+  Kvaaas kvs("abobus", get_kvaaas_option(already, 0.65));
 
   for (const auto &key : keys_already_in) {
-    kvs.add(key, gen_value());
+    kvs.add(key, gen_value(value_size));
   }
 
   std::discrete_distribution disc_dist(
@@ -81,7 +95,7 @@ stat collect_stat(const unsigned already, const unsigned total,
       max_per_read = std::max<Nanoseconds>(max_per_read, end - begin);
     } else if (type == 1) { // writing
       ++cnt_write;
-      auto value = gen_value();
+      auto value = gen_value(value_size);
       TimePoint begin = Now();
       kvs.add(key, value);
       TimePoint end = Now();
@@ -95,10 +109,10 @@ stat collect_stat(const unsigned already, const unsigned total,
 
 } // namespace
 
-// usage: %program% ALREADY_IN TOTAL_QUERIES READ_PERCENT OUTPUT_FILE
+// usage: %program% ALREADY_IN TOTAL_QUERIES READ_PERCENT VALUE_SIZE OUTPUT_FILE
 int main(const int argc, const char **argv) {
-  if (argc < 5) {
-    std::cout << "Usage: %program% ALREADY_IN TOTAL_QUERIES READ_PERCENT"
+  if (argc < 6) {
+    std::cout << "Usage: %program% ALREADY_IN TOTAL_QUERIES READ_PERCENT VALUE_SIZE OUTPUT_FILE"
               << std::endl;
     return 1;
   }
@@ -119,13 +133,27 @@ int main(const int argc, const char **argv) {
     return t;
   }();
 
-  auto stat = collect_stat(ALREADY_IN, TOTAL_QUERIES, READ_PERCENT);
+  const unsigned VALUE_SIZE = [argv]() {
+      unsigned t = 1;
+        sscanf(argv[4], "%u", &t);
+        assert(t > 0);
+        return t;
+  }();
 
-  std::ofstream out(argv[4]);
+  auto stat = collect_stat(ALREADY_IN, TOTAL_QUERIES, READ_PERCENT, VALUE_SIZE);
+
+    std::cout << "avg per request (ns): " << stat.time_per_request.count() << "\n" <<
+                 "avg per write (ns)  : " << stat.time_per_write.count() << '\n' <<
+                 "avg per read (ns)   : " << stat.time_per_read.count() << '\n' <<
+                 "max per write (ns)  : " << stat.max_per_write.count() << '\n' <<
+                 "max per read (ns)   : " << stat.max_per_read.count() << '\n' << std::endl;
+
+  std::ofstream out(argv[5]);
   nlohmann::json json;
   json["already_in"] = ALREADY_IN;
   json["total_queries"] = TOTAL_QUERIES;
   json["read_percent"] = READ_PERCENT;
+  json["value_size"] = VALUE_SIZE;
   json["avg_per_request"] = stat.time_per_request.count();
   json["avg_per_write"] = stat.time_per_write.count();
   json["max_per_write"] = stat.max_per_write.count();

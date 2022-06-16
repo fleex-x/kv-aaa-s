@@ -29,29 +29,22 @@ struct SSTRecordViewer {
       : _data(data) {} // remove later ??
 
   void append(const SSTRecord &rec) {
-    std::vector<ByteType> vec(rec.key.size() + sizeof(std::uint64_t));
-    std::copy(rec.key.begin(), rec.key.end(), vec.begin());
-    std::memcpy(vec.data() + rec.key.size(), &rec.offset,
-                sizeof(std::uint64_t));
-    _data->append(vec);
+      _data->append(rec.key.data(), rec.key.size());
+      _data->append(reinterpret_cast<const ByteType *>(&rec.offset), sizeof(rec.offset));
   }
 
   SSTRecord get_record(std::size_t index) {
     SSTRecord rec;
-    const std::size_t REC_SIZE = rec.key.size() + sizeof(std::uint64_t);
-    auto vec = _data->read(index * REC_SIZE, (index + 1) * REC_SIZE);
-    std::copy(vec.begin(), std::next(vec.begin(), rec.key.size()),
-              rec.key.begin());
-    std::memcpy(&rec.offset, vec.data() + rec.key.size(),
-                sizeof(std::uint64_t));
+    static const std::size_t REC_SIZE = KEY_SIZE_BYTES + sizeof(std::uint64_t);
+    auto begin = index * REC_SIZE;
+    _data->read_ptr(rec.key.data(), begin, begin + rec.key.size());
+    _data->read_ptr(reinterpret_cast<ByteType *>(&rec.offset), begin + rec.key.size(), begin + rec.key.size() + sizeof(rec.offset));
     return rec;
   }
 
   void change_offset(std::size_t index, std::uint64_t new_offset) {
-    const std::size_t REC_SIZE = KEY_SIZE_BYTES + sizeof(std::uint64_t);
-    std::vector<ByteType> vec(sizeof(std::uint64_t));
-    std::memcpy(vec.data(), &new_offset, sizeof(std::uint64_t));
-    _data->rewrite(REC_SIZE * index + KEY_SIZE_BYTES, vec);
+      static const std::size_t REC_SIZE = KEY_SIZE_BYTES + sizeof(std::uint64_t);
+      _data->rewrite(REC_SIZE * index + KEY_SIZE_BYTES, reinterpret_cast<const ByteType *>(&new_offset), sizeof(new_offset));
   }
 
   SSTRecordViewer(ByteArrayPtr data, RebuildSSTRV) : _data(data) {}
